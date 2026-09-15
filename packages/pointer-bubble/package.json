@@ -21,13 +21,8 @@
     },
     "./styles.css": "./dist/styles.css"
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "files": ["dist", "README.md"],
+  "sideEffects": ["**/*.css"],
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0"
   },
@@ -35,8 +30,17 @@
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.6.0"
   },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
+  },
   "scripts": {
     "build": "vite build --config vite.config.ts && tsc -p tsconfig.build.json && node scripts/write-cjs-types.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.mjs",
     "prepack": "npm run build"
   },
   "repository": {

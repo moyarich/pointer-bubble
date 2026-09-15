@@ -4,7 +4,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
-import { PointerBubble } from '../packages/pointer-bubble/dist/index.js';
+import { PointerBubble } from '../dist/index.js';
 
 const render = (props = {}) => renderToStaticMarkup(createElement(PointerBubble, props, props.children ?? 'Oak'));
 
@@ -45,17 +45,17 @@ test('keeps slot classes and resolves conflicting Tailwind utilities', () => {
 
 test('CommonJS and ESM consumers render the same component', () => {
   const require = createRequire(import.meta.url);
-  const cjs = require('../packages/pointer-bubble/dist/index.cjs');
+  const cjs = require('../dist/index.cjs');
   assert.equal(renderToStaticMarkup(createElement(cjs.PointerBubble, null, 'Oak')), render());
 });
 
 test('release entry is independent of playground and styles are explicitly exported', () => {
-  const pkg = JSON.parse(readFileSync(new URL('../packages/pointer-bubble/package.json', import.meta.url)));
-  const bundle = readFileSync(new URL('../packages/pointer-bubble/dist/index.js', import.meta.url), 'utf8');
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
+  const bundle = readFileSync(new URL('../dist/index.js', import.meta.url), 'utf8');
   assert.doesNotMatch(bundle, /monaco|maplibre|lucide|react-dom|window\.|document\./);
   assert.equal(pkg.exports['./styles.css'], './dist/styles.css');
   assert.equal(pkg.peerDependencies.react, '^18.2.0 || ^19.0.0');
-  const css = readFileSync(new URL('../packages/pointer-bubble/dist/styles.css', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
   assert.match(css, /prefers-reduced-motion/);
   assert.doesNotMatch(css, /:root|(?:^|\n)\s*body\s*\{|@import/);
 });
