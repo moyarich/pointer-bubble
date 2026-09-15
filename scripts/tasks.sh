@@ -8,7 +8,8 @@ choices=(
   "Preview production playground"
   "Run tests"
   "Check npm release (dry run)"
-  "Publish library to npm (live)"
+  "Publish first npm release (interactive)"
+  "Stage next npm release"
 )
 
 # --list supports shell completion, documentation, and non-interactive checks.
@@ -22,7 +23,7 @@ if [[ $# -gt 0 ]]; then
 fi
 
 if command -v fzf >/dev/null 2>&1; then
-  choice=$(printf '%s\n' "${choices[@]}" | fzf --height=14 --layout=reverse --border --prompt='PointerBubble > ' --header='Select a task; Esc cancels') || exit 0
+  choice=$(printf '%s\n' "${choices[@]}" | fzf --height=16 --layout=reverse --border --prompt='PointerBubble > ' --header='Select a task; Esc cancels') || exit 0
 elif [[ -t 0 ]]; then
   printf 'fzf is not installed; choose a task by number (Ctrl-C cancels).\n'
   PS3='PointerBubble > '
@@ -41,7 +42,8 @@ case "${choice:-}" in
   "Preview production playground") exec npm run preview ;;
   "Run tests") exec npm test ;;
   "Check npm release (dry run)") exec npm run release:check ;;
-  "Publish library to npm (live)") exec npm run publish:lib ;;
+  "Publish first npm release (interactive)") exec npm run publish:first ;;
+  "Stage next npm release") exec npm run stage:lib ;;
   "") exit 0 ;;
   *) printf 'Unknown task.\n' >&2; exit 2 ;;
 esac
