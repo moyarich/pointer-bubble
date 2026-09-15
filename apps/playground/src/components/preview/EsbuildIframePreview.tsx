@@ -3,6 +3,7 @@ import { Leaf, Sprout, TreePine, Code2, X, Copy, Check, Grip, GripVertical, Pane
 import { PointerBubble } from "@moyarich/pointer-bubble";
 import { createRoot } from "react-dom/client";
 import * as maplibregl from "../maplibre";
+import { createRenderedOutput, type RenderedOutput } from "@/utils/renderedOutput";
 import { createIsolatedPreviewHtml, initializeSharedEsbuild, createIframePreviewEntrySource, getPreviewErrorCategory, type PreviewErrorCategory, type EsbuildTransformResult } from "./runtime";
 function createPreviewHostModules() {
   return {
@@ -39,10 +40,12 @@ export function EsbuildIframePreview({
   code,
   runKey = 0,
   autoRunPreview = true,
+  onRenderedOutput,
 }: {
   code: string;
   runKey?: number;
   autoRunPreview?: boolean;
+  onRenderedOutput?: (output: RenderedOutput | null) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -69,6 +72,10 @@ export function EsbuildIframePreview({
         setStatus("ready");
         setErrorMessage("");
         setErrorCategory("Preview error");
+        window.requestAnimationFrame(() => {
+          const document = iframeRef.current?.contentDocument;
+          onRenderedOutput?.(document ? createRenderedOutput(document) : null);
+        });
       }
       if (event.data.type === "POINTER_BUBBLE_PREVIEW_ERROR") {
         if (previewTimeoutRef.current) {
@@ -78,12 +85,13 @@ export function EsbuildIframePreview({
         setStatus("error");
         setErrorMessage(event.data.message || "Preview failed.");
         setErrorCategory(event.data.category || "Runtime error");
+        onRenderedOutput?.(null);
       }
     }
 
     window.addEventListener("message", handlePreviewMessage);
     return () => window.removeEventListener("message", handlePreviewMessage);
-  }, []);
+  }, [onRenderedOutput]);
 
   useEffect(() => {
     let cancelled = false;
@@ -104,6 +112,7 @@ export function EsbuildIframePreview({
         setStatus("loading");
         setErrorMessage("");
         setErrorCategory("Preview error");
+        onRenderedOutput?.(null);
 
         const esbuild = await initializeSharedEsbuild();
         const result = (await esbuild.transform(
@@ -125,6 +134,7 @@ export function EsbuildIframePreview({
           setErrorMessage(
             "The iframe preview did not respond. A runtime import may have failed to load.",
           );
+          onRenderedOutput?.(null);
         }, 4000);
         iframeRef.current?.contentWindow?.postMessage(
           { type: "POINTER_BUBBLE_RUN_PREVIEW", compiledCode: result.code },
@@ -135,6 +145,7 @@ export function EsbuildIframePreview({
         setStatus("error");
         setErrorMessage(error instanceof Error ? error.message : String(error));
         setErrorCategory(getPreviewErrorCategory(error));
+        onRenderedOutput?.(null);
       }
     }
 
@@ -147,7 +158,7 @@ export function EsbuildIframePreview({
         previewTimeoutRef.current = null;
       }
     };
-  }, [code, iframeLoaded, runKey, autoRunPreview]);
+  }, [code, iframeLoaded, runKey, autoRunPreview, onRenderedOutput]);
 
   useEffect(() => {
     const previewWindow = iframeRef.current?.contentWindow as
