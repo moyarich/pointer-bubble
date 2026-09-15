@@ -49,11 +49,14 @@ test('CommonJS and ESM consumers render the same component', () => {
   assert.equal(renderToStaticMarkup(createElement(cjs.PointerBubble, null, 'Oak')), render());
 });
 
-test('release entry is independent of playground and styles are explicitly exported', () => {
+test('release entry auto-loads styles in browsers while remaining SSR-safe', () => {
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
   const bundle = readFileSync(new URL('../dist/index.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(bundle, /monaco|maplibre|lucide|react-dom|window\.|document\./);
+  assert.doesNotMatch(bundle, /monaco|maplibre|lucide|react-dom|window\./);
+  assert.match(bundle, /data-pointer-bubble-styles/);
+  assert.match(bundle, /typeof document/);
   assert.equal(pkg.exports['./styles.css'], './dist/styles.css');
+  assert.deepEqual(pkg.sideEffects, ['**/*.css', './dist/index.js', './dist/index.cjs']);
   assert.equal(pkg.peerDependencies.react, '>=18.2.0');
   const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
   assert.match(css, /prefers-reduced-motion/);

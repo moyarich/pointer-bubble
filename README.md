@@ -16,17 +16,12 @@ Live demo: https://moyarich.github.io/pointer-bubble/
 npm install @moyarich/pointer-bubble
 ```
 
-Import the stylesheet once in your application:
-
-```tsx
-import "@moyarich/pointer-bubble/styles.css";
-```
+Styles load automatically when you import the package. No separate CSS import is required.
 
 ## Quick Start
 
 ```tsx
 import { PointerBubble } from "@moyarich/pointer-bubble";
-import "@moyarich/pointer-bubble/styles.css";
 
 export function LocationMarker() {
   return (
@@ -56,6 +51,7 @@ export function LocationMarker() {
 - Standard `div` attributes and refs
 - Reduced-motion support
 - Map-library agnostic marker content
+- Automatic style loading
 
 ## Real MapLibre Example
 
@@ -69,7 +65,6 @@ import { createRoot } from "react-dom/client";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { PointerBubble } from "@moyarich/pointer-bubble";
-import "@moyarich/pointer-bubble/styles.css";
 
 const pins = [
   { label: "Mint", lng: -87.631, lat: 41.883, color: "#79bd9a" },
@@ -320,7 +315,7 @@ PointerBubbleProps;
 PointerBubbleSize;
 ```
 
-Styles are exported separately:
+The package injects its component CSS automatically in browsers. The standalone stylesheet export remains available for advanced use cases:
 
 ```tsx
 import "@moyarich/pointer-bubble/styles.css";
