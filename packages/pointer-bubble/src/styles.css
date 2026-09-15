@@ -1,3 +1,6 @@
+/* Declare layer order before auto-injected defaults can precede Tailwind. */
+@layer theme, base, components, utilities;
+
 /* Standalone defaults. The components layer lets application CSS and Tailwind
    utilities override these styles without requiring !important. No global reset. */
 @layer components {
