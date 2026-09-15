@@ -162,7 +162,7 @@ NPM_ACCESS=public
 
 Copyable examples live in `apps/playground/examples/` as real `.tsx` files outside the playground's TypeScript source tree. The playground loads those same files with Vite's `?raw` support for the code drawer, so rendered playground metadata no longer embeds large duplicate source strings.
 
-Marker gallery composition is split across smaller modules in `apps/playground/src/playground/examples/`, while `PlaygroundExamples.tsx` keeps `App.tsx` shallow. When adding an example, put the consumer-facing React code in `apps/playground/examples` and reference it with `exampleSource(...)`; do not paste a second copy into playground rendering code.
+Marker gallery composition is split across smaller modules in `apps/playground/src/playground/examples/`, while `PlaygroundExamples.tsx` keeps `App.tsx` shallow. When adding an example, put the consumer-facing React code in `apps/playground/examples` and reference it with `findExampleSource(...)`; do not paste a second copy into playground rendering code.
 
 ## Playground notes
 

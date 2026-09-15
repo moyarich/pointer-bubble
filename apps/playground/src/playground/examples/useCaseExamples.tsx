@@ -1,7 +1,7 @@
 import { Leaf } from "lucide-react";
 import { PointerBubble, type PointerBubbleProps } from "@moyarich/pointer-bubble";
 import { PlaygroundDrawerTrigger } from "../drawer/PlaygroundDrawer";
-import { exampleSource } from "./exampleSource";
+import { findExampleSource } from "@/utils/findExampleSource";
 import { googlePin } from "./markerVariants";
 
 const useCases: Array<{
@@ -19,7 +19,7 @@ const useCases: Array<{
       selected: true,
       children: <Leaf className="h-5 w-5" strokeWidth={3} />,
     },
-    sourceCode: exampleSource("markers/map-pin"),
+    sourceCode: findExampleSource("markers/map-pin"),
   },
   {
     id: "Google Map Pin",
@@ -42,7 +42,7 @@ const useCases: Array<{
       contentClass: "min-h-0 min-w-0 px-0 text-left leading-relaxed",
       children: "This is a speech bubble made from the same component.",
     },
-    sourceCode: exampleSource("markers/speech-bubble"),
+    sourceCode: findExampleSource("markers/speech-bubble"),
   },
   {
     id: "Callout",
@@ -60,7 +60,7 @@ const useCases: Array<{
       children:
         "Tip: click a saved plant to edit notes, photos, and location details.",
     },
-    sourceCode: exampleSource("markers/callout"),
+    sourceCode: findExampleSource("markers/callout"),
   },
   {
     id: "Badge",
@@ -77,7 +77,7 @@ const useCases: Array<{
       contentClass: "min-h-0 min-w-0 px-0 leading-none",
       children: "Native Plant",
     },
-    sourceCode: exampleSource("markers/badge"),
+    sourceCode: findExampleSource("markers/badge"),
   },
   {
     id: "Tooltip-style Marker",
@@ -93,7 +93,7 @@ const useCases: Array<{
       contentClass: "min-h-0 min-w-0 px-0 text-left leading-snug",
       children: "Last updated today",
     },
-    sourceCode: exampleSource("markers/tooltip-style-marker"),
+    sourceCode: findExampleSource("markers/tooltip-style-marker"),
   },
 ];
 
