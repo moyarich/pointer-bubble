@@ -162,22 +162,92 @@ NPM_ACCESS=public
 
 The editable TSX preview depends on external services for Monaco, map tiles, and browser-side compilation/styling resources. It is intended for trusted examples, not as a security sandbox for untrusted code.
 
-## GitHub Pages
+## GitHub Actions
 
-`.github/workflows/playground-pages.yml` builds only `apps/playground` and uploads:
+The repository has two GitHub Actions workflows:
 
 ```text
-apps/playground/dist/
+.github/workflows/ci.yml
+.github/workflows/playground-pages.yml
 ```
+
+### CI
+
+`CI` is the validation gate for both the publishable library and the playground.
+
+It runs automatically when:
+
+- a pull request is opened or updated
+- commits are pushed to `main`
+
+It can also be started manually from the Actions tab because the workflow supports `workflow_dispatch`.
+
+The validation job performs:
+
+```text
+npm ci
+npm audit --audit-level=high
+npm run release:check
+npm run build:playground
+```
+
+This checks dependency security, library type/build/test/package behavior, and the actual Vite playground build before deployment is allowed to start.
+
+### Playground deployment
+
+`Deploy PointerBubble playground` publishes the private workspace app in `apps/playground` to GitHub Pages.
+
+It does **not** run directly on every push. Instead, it listens for the `CI` workflow to finish on `main` and proceeds only when CI concluded successfully.
+
+The workflow checks out the exact commit validated by CI using `workflow_run.head_sha`, then:
+
+1. installs dependencies with `npm ci`
+2. configures GitHub Pages and obtains the project base path
+3. builds only the playground with `PLAYGROUND_BASE_PATH`
+4. uploads `apps/playground/dist/` as the Pages artifact
+5. deploys that artifact to the `github-pages` environment
+
+Library tests and release validation are intentionally **not repeated** in the Pages workflow because CI already completed them successfully for the same commit.
+
+`apps/playground/dist/` is generated during the workflow and remains git-ignored. It should not be committed to the repository.
+
+Enable Pages once under **Settings → Pages → Build and deployment → GitHub Actions**. After that, a successful CI run for a merge or push to `main` automatically triggers the playground deployment.
 
 The Vite base path is supplied by the workflow so project Pages URLs such as `moyarich.github.io/pointer-bubble/` work correctly.
 
-Enable Pages once under **Settings → Pages → Build and deployment → GitHub Actions**, then run **Deploy PointerBubble playground**.
+### What happens after a merge to `main`
 
-To test a project-subpath-style build locally:
+The workflows now run in sequence rather than duplicating validation work:
+
+```text
+merge / push to main
+└── CI
+    ├── install
+    ├── security audit
+    ├── release validation
+    └── playground build
+        │
+        └── success
+            └── Deploy PointerBubble playground
+                ├── install
+                ├── configure Pages
+                ├── build playground for Pages base path
+                ├── upload Pages artifact
+                └── deploy
+```
+
+If CI fails, the Pages build/deployment jobs are skipped.
+
+The npm package is **not** automatically published by these workflows. Publishing remains an explicit release action through:
 
 ```sh
-PLAYGROUND_BASE_PATH=/ npm run build:playground
+npm run publish:lib
+```
+
+To test a project-subpath-style Pages build locally:
+
+```sh
+PLAYGROUND_BASE_PATH=/pointer-bubble/ npm run build:playground
 npm run preview
 ```
 
