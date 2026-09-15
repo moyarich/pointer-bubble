@@ -5,6 +5,7 @@ import { createRenderedOutput, type RenderedOutput } from "@/utils/renderedOutpu
 import { RenderedOutputPanel } from "./RenderedOutputPanel";
 
 const drawerSelector = 'aside[role="dialog"]';
+const inspectorAttribute = "data-rendered-output-inspector";
 
 function findDrawerOutputHost() {
   const drawer = document.querySelector<HTMLElement>(drawerSelector);
@@ -15,6 +16,15 @@ function findDrawerOutputHost() {
   );
 
   return livePreviewLabel?.parentElement?.parentElement ?? null;
+}
+
+function findPreviewRoot(host: HTMLElement) {
+  return Array.from(host.children).find(
+    (element) =>
+      element instanceof HTMLElement &&
+      !element.hasAttribute(inspectorAttribute) &&
+      !element.querySelector("span")?.textContent?.includes("Live Preview"),
+  ) as HTMLElement | undefined;
 }
 
 function readRenderedOutput(host: HTMLElement): RenderedOutput | null {
@@ -34,15 +44,17 @@ export function RenderedBubbleInspector() {
 
   useEffect(() => {
     let previewObserver: MutationObserver | null = null;
+    let hostObserver: MutationObserver | null = null;
     let iframeObserver: MutationObserver | null = null;
     let observedHost: HTMLElement | null = null;
 
     function disconnectPreviewObservers() {
       previewObserver?.disconnect();
+      hostObserver?.disconnect();
       iframeObserver?.disconnect();
       previewObserver = null;
+      hostObserver = null;
       iframeObserver = null;
-      observedHost = null;
     }
 
     function capture(nextHost: HTMLElement | null) {
@@ -78,37 +90,46 @@ export function RenderedBubbleInspector() {
       captureIframe();
     }
 
-    function observePreview(nextHost: HTMLElement | null) {
-      if (nextHost === observedHost) {
-        capture(nextHost);
-        return;
-      }
+    function observePreview(nextHost: HTMLElement | null, force = false) {
+      if (!force && nextHost === observedHost) return;
 
       disconnectPreviewObservers();
-      if (!nextHost) {
-        capture(null);
-        return;
-      }
-
       observedHost = nextHost;
       capture(nextHost);
+      if (!nextHost) return;
 
-      previewObserver = new MutationObserver(() => {
-        setOutput(readRenderedOutput(nextHost));
-        observeIframe(nextHost);
+      const previewRoot = findPreviewRoot(nextHost);
+      if (previewRoot) {
+        previewObserver = new MutationObserver(() => {
+          setOutput(readRenderedOutput(nextHost));
+          observeIframe(nextHost);
+        });
+        previewObserver.observe(previewRoot, {
+          attributes: true,
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+      }
+
+      hostObserver = new MutationObserver((records) => {
+        const previewChanged = records.some((record) =>
+          [...record.addedNodes, ...record.removedNodes].some(
+            (node) =>
+              !(node instanceof HTMLElement) ||
+              !node.hasAttribute(inspectorAttribute),
+          ),
+        );
+        if (previewChanged) observePreview(nextHost, true);
       });
-      previewObserver.observe(nextHost, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
+      hostObserver.observe(nextHost, { childList: true });
 
       observeIframe(nextHost);
     }
 
     const drawerObserver = new MutationObserver(() => {
-      observePreview(findDrawerOutputHost());
+      const nextHost = findDrawerOutputHost();
+      if (nextHost !== observedHost) observePreview(nextHost);
     });
 
     drawerObserver.observe(document.body, { childList: true, subtree: true });
@@ -123,7 +144,7 @@ export function RenderedBubbleInspector() {
   if (!host) return null;
 
   return createPortal(
-    <div className="mt-3 min-h-[16rem]">
+    <div {...{ [inspectorAttribute]: "" }} className="mt-3 min-h-[16rem]">
       <RenderedOutputPanel output={output} />
     </div>,
     host,
