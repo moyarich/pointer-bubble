@@ -1,9 +1,5 @@
-import { MarkerVariantsDemo, UseCaseExamplesDemo, SpeechBubbleExamplesDemo } from "./playground/examples/markerExamples";
-import { lazy, Suspense } from "react";
-const SimpleMapPinsDemo = lazy(() => import("./playground/examples/mapExamples").then(module => ({ default: module.SimpleMapPinsDemo })));
-const MultiPinMapDemo = lazy(() => import("./playground/examples/mapExamples").then(module => ({ default: module.MultiPinMapDemo })));
-const MapLibrePinsDemo = lazy(() => import("./playground/examples/mapExamples").then(module => ({ default: module.MapLibrePinsDemo })));
 import { SharedPlaygroundDrawerHost } from "./playground/drawer/PlaygroundDrawer";
+import { PlaygroundExamples } from "./playground/examples/PlaygroundExamples";
 import "./playground/playground.css";
 
 export default function App() {
@@ -19,14 +15,7 @@ export default function App() {
             preset tone prop is needed.
           </p>
         </header>
-        <MarkerVariantsDemo />
-        <UseCaseExamplesDemo />
-        <SpeechBubbleExamplesDemo />
-        <Suspense fallback={<p role="status">Loading map examples…</p>}>
-          <SimpleMapPinsDemo />
-          <MultiPinMapDemo />
-          <MapLibrePinsDemo />
-        </Suspense>
+        <PlaygroundExamples />
         <SharedPlaygroundDrawerHost />
       </div>
     </div>

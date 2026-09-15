@@ -158,6 +158,12 @@ NPM_TAG=latest
 NPM_ACCESS=public
 ```
 
+## Example source architecture
+
+Copyable examples live in `apps/playground/examples/` as real `.tsx` files outside the playground's TypeScript source tree. The playground loads those same files with Vite's `?raw` support for the code drawer, so rendered playground metadata no longer embeds large duplicate source strings.
+
+Marker gallery composition is split across smaller modules in `apps/playground/src/playground/examples/`, while `PlaygroundExamples.tsx` keeps `App.tsx` shallow. When adding an example, put the consumer-facing React code in `apps/playground/examples` and reference it with `exampleSource(...)`; do not paste a second copy into playground rendering code.
+
 ## Playground notes
 
 The editable TSX preview depends on external services for Monaco, map tiles, and browser-side compilation/styling resources. It is intended for trusted examples, not as a security sandbox for untrusted code.
