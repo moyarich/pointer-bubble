@@ -1,5 +1,6 @@
 import { SharedPlaygroundDrawerHost } from "./components/drawer/PlaygroundDrawer";
 import { PlaygroundExamples } from "./components/examples/PlaygroundExamples";
+import { RenderedBubbleInspector } from "./components/preview/RenderedBubbleInspector";
 import "./components/playground.css";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         </header>
         <PlaygroundExamples />
         <SharedPlaygroundDrawerHost />
+        <RenderedBubbleInspector />
       </div>
     </div>
   );
