@@ -198,7 +198,7 @@ function formatNode(node: Node, depth = 0): string {
 
   if (node.nodeType === 3) {
     const text = node.textContent?.trim();
-    return text ? `${indent}${text}` : "";
+    return text ? `${indent}${escapeHtml(text)}` : "";
   }
 
   if (node.nodeType !== 1) return "";
@@ -222,8 +222,16 @@ function cssBlock(selector: string, declarations: string[]) {
   return `${selector} {\n${declarations.map((line) => `  ${line}`).join("\n")}\n}`;
 }
 
+function resolveBubble(root: ParentNode) {
+  if (root.nodeType === 1) {
+    const element = root as HTMLElement;
+    if (element.matches(".better-map-marker")) return element;
+  }
+  return root.querySelector<HTMLElement>(".better-map-marker");
+}
+
 export function createRenderedOutput(root: ParentNode): RenderedOutput | null {
-  const bubble = root.querySelector<HTMLElement>(".better-map-marker");
+  const bubble = resolveBubble(root);
   if (!bubble) return null;
 
   const view = bubble.ownerDocument.defaultView;
