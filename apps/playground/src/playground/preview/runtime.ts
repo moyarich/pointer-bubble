@@ -29,14 +29,18 @@ export function getPreviewErrorCategory(error: unknown): PreviewErrorCategory {
     return "Compile error";
   }
 
-  if (normalizedMessage.includes("iframe")) {
+  if (
+    normalizedMessage.includes("iframe") ||
+    normalizedMessage.includes("postmessage") ||
+    normalizedMessage.includes("sandbox")
+  ) {
     return "Iframe error";
   }
 
   if (
-    normalizedMessage.includes("runtime") ||
     normalizedMessage.includes("referenceerror") ||
-    normalizedMessage.includes("typeerror")
+    normalizedMessage.includes("typeerror") ||
+    normalizedMessage.includes("is not defined")
   ) {
     return "Runtime error";
   }
@@ -44,87 +48,234 @@ export function getPreviewErrorCategory(error: unknown): PreviewErrorCategory {
   return "Preview error";
 }
 
-export function getPlainErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === "string") return error;
-  try {
-    return JSON.stringify(error);
-  } catch {
-    return String(error);
-  }
-}
+async function loadSharedEsbuildRuntime() {
+  if (sharedEsbuildRuntime?.transform) return sharedEsbuildRuntime;
 
-function getGlobalEsbuild(): any {
-  return (globalThis as any).esbuild;
-}
+  const loadedModule = await import(/* @vite-ignore */ ESBUILD_MODULE_URL);
+  const runtime = loadedModule.default?.transform
+    ? loadedModule.default
+    : loadedModule;
 
-async function importEsbuildRuntime(): Promise<any> {
-  const existing = getGlobalEsbuild();
-  if (existing) return existing;
-
-  if (!sharedEsbuildRuntime) {
-    sharedEsbuildRuntime = await import(/* @vite-ignore */ ESBUILD_MODULE_URL);
+  if (!runtime?.initialize || !runtime?.transform) {
+    throw new Error(
+      "esbuild-wasm did not load correctly. The CDN module is missing initialize() or transform().",
+    );
   }
 
-  return sharedEsbuildRuntime;
+  sharedEsbuildRuntime = runtime;
+  return runtime;
 }
 
-export async function ensureEsbuildInitialized(): Promise<any> {
-  const existing = getGlobalEsbuild();
-  if (existing?.transform) return existing;
+export async function initializeSharedEsbuild() {
+  if (sharedEsbuildInitializePromise) return sharedEsbuildInitializePromise;
 
-  if (!sharedEsbuildInitializePromise) {
-    sharedEsbuildInitializePromise = (async () => {
-      const runtime = await importEsbuildRuntime();
-      const initialize = runtime.initialize ?? runtime.default?.initialize;
-      const transform = runtime.transform ?? runtime.default?.transform;
+  sharedEsbuildInitializePromise = loadSharedEsbuildRuntime().then(
+    async (runtime) => {
+      try {
+        await runtime.initialize({ wasmURL: ESBUILD_WASM_URL, worker: true });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        const normalizedMessage = message.toLowerCase();
 
-      if (typeof initialize !== "function" || typeof transform !== "function") {
-        throw new Error("The esbuild runtime did not expose initialize() and transform().");
+        if (
+          !normalizedMessage.includes("already initialized") &&
+          !normalizedMessage.includes("more than once") &&
+          !normalizedMessage.includes("cannot call initialize")
+        ) {
+          throw error;
+        }
       }
 
-      await initialize({ wasmURL: ESBUILD_WASM_URL });
-
-      const normalizedRuntime = { ...runtime, transform };
-      (globalThis as any).esbuild = normalizedRuntime;
-      return normalizedRuntime;
-    })().catch((error) => {
-      sharedEsbuildInitializePromise = null;
-      throw error;
-    });
-  }
+      return runtime;
+    },
+  );
 
   return sharedEsbuildInitializePromise;
 }
 
-export async function transformTsx(source: string): Promise<EsbuildTransformResult> {
-  const esbuild = await ensureEsbuildInitialized();
-  const result = await esbuild.transform(source, {
-    loader: "tsx",
-    jsx: "automatic",
-    format: "esm",
-    target: "es2022",
-    sourcemap: "inline",
-  });
+function getIframePreviewComponentName(sourceCode: string) {
+  const token = "export default function ";
+  const start = sourceCode.indexOf(token);
+  if (start < 0) return "Demo";
 
-  return { code: result.code };
+  const nameStart = start + token.length;
+  const rest = sourceCode.slice(nameStart);
+  const name = rest.split("(")[0]?.trim();
+  return name || "Demo";
 }
 
-export function buildIframeDocument(compiledCode: string): string {
-  const escapedStyles = pointerBubbleStyles.replace(/<\/style/gi, "<\\/style");
-  const escapedCode = compiledCode.replace(/<\/script/gi, "<\\/script");
+function removeQuoteSyntax(value: string) {
+  return value.trim().replace(";", "").replaceAll("'", "").replaceAll('"', "");
+}
 
+function normalizeNamedImportBindings(bindings: string) {
+  return bindings;
+}
+
+function previewImportLineToAssignment(line: string) {
+  const trimmed = line.trim();
+  if (!trimmed.startsWith("import ")) return line;
+
+  const sideEffectPrefix = "import ";
+  const fromToken = " from ";
+
+  if (!trimmed.includes(fromToken)) return "";
+
+  const fromIndex = trimmed.lastIndexOf(fromToken);
+  const bindings = trimmed.slice(sideEffectPrefix.length, fromIndex).trim();
+  const packageName = removeQuoteSyntax(
+    trimmed.slice(fromIndex + fromToken.length),
+  );
+
+  if (!packageName || packageName.endsWith(".css")) return "";
+  if (bindings.startsWith("type ")) return "";
+
+  const moduleAccess = "passedModules[" + JSON.stringify(packageName) + "]";
+
+  if (bindings.startsWith("{")) {
+    return (
+      "const " +
+      normalizeNamedImportBindings(bindings) +
+      " = " +
+      moduleAccess +
+      ";"
+    );
+  }
+
+  if (bindings.startsWith("* as ")) {
+    return (
+      "const " +
+      bindings.replace("* as ", "").trim() +
+      " = " +
+      moduleAccess +
+      ";"
+    );
+  }
+
+  if (bindings.includes(",")) {
+    const parts = bindings.split(",", 2).map((part) => part.trim());
+    const defaultImport = parts[0];
+    const namedImport = parts[1] || "";
+    return [
+      "const " +
+        defaultImport +
+        " = " +
+        moduleAccess +
+        ".default ?? " +
+        moduleAccess +
+        ";",
+      namedImport.startsWith("{")
+        ? "const " +
+          normalizeNamedImportBindings(namedImport) +
+          " = " +
+          moduleAccess +
+          ";"
+        : "",
+    ]
+      .filter(Boolean)
+      .join(String.fromCharCode(10));
+  }
+
+  return (
+    "const " +
+    bindings +
+    " = " +
+    moduleAccess +
+    ".default ?? " +
+    moduleAccess +
+    ";"
+  );
+}
+
+function prepareIframePreviewSource(sourceCode: string) {
+  const componentName = getIframePreviewComponentName(sourceCode);
+
+  return sourceCode
+    .split(String.fromCharCode(10))
+    .map(previewImportLineToAssignment)
+    .join(String.fromCharCode(10))
+    .replace(
+      "export default function " + componentName,
+      "function " + componentName,
+    )
+    .replace("export default function Demo", "function Demo")
+    .replace("export function Demo", "function Demo");
+}
+
+export function createIframePreviewEntrySource(sourceCode: string) {
+  const componentName = getIframePreviewComponentName(sourceCode);
+  return (
+    prepareIframePreviewSource(sourceCode) +
+    String.fromCharCode(10) +
+    "globalThis.__POINTER_BUBBLE_DEMO__ = " +
+    componentName +
+    ";"
+  );
+}
+
+export function createIsolatedPreviewHtml() {
   return `<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>${escapedStyles}</style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.9.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>${pointerBubbleStyles}</style>
+    <style>
+      html, body, #root { width: 100%; height: 100%; margin: 0; }
+      body { background: #f8fafc; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      #root { display: grid; place-items: center; min-height: 100%; padding: 2rem; box-sizing: border-box; }
+      .preview-error { max-width: 90%; border: 1px solid #fecaca; background: #fef2f2; color: #991b1b; border-radius: 1rem; padding: 1rem; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; white-space: pre-wrap; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module">
-      ${escapedCode}
+      let React;
+      let createRoot;
+
+      const rootElement = document.getElementById('root');
+      let root;
+
+      function getPreviewHostModules() {
+        return window.__PREVIEW_HOST_MODULES__ ?? {};
+      }
+
+      const previewHostModules = getPreviewHostModules();
+
+      function renderError(message, category = 'Runtime error') {
+        root.render(React.createElement('pre', { className: 'preview-error' }, category + String.fromCharCode(10) + message));
+      }
+
+      window.addEventListener('message', (event) => {
+        if (event.source !== window.parent || !event.data || event.data.type !== 'POINTER_BUBBLE_RUN_PREVIEW') return;
+
+        try {
+          const modules = getPreviewHostModules();
+          React = modules.react;
+          createRoot = modules['react-dom/client'].createRoot;
+          root?.unmount();
+          rootElement.innerHTML = '';
+          root = createRoot(rootElement);
+
+          delete globalThis.__POINTER_BUBBLE_DEMO__;
+          const hostModules = getPreviewHostModules();
+          const runtimePointerBubble = hostModules['@moyarich/pointer-bubble']?.PointerBubble;
+          const runtimeMapLibre = hostModules['maplibre-gl'];
+          const runtimeReactDomClient = hostModules['react-dom/client'] ?? { createRoot };
+          const getDemo = new Function('React', 'PointerBubble', 'maplibregl', 'createRoot', 'passedModules', event.data.compiledCode + String.fromCharCode(10) + 'return globalThis.__POINTER_BUBBLE_DEMO__;');
+          const Demo = getDemo(React, runtimePointerBubble, runtimeMapLibre, runtimeReactDomClient.createRoot ?? createRoot, hostModules);
+          if (typeof Demo !== 'function') throw new Error('The preview code must export a Demo component.');
+
+          root.render(React.createElement(Demo));
+          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_READY' }, '*');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          renderError(message, 'Runtime error');
+          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_ERROR', message, category: 'Runtime error' }, '*');
+        }
+      });
     </script>
   </body>
 </html>`;
