@@ -1,20 +1,26 @@
 # @moyarich/pointer-bubble
 
-Customizable React pointer bubbles for map markers, labels, and callouts. Requires React 19. This package is in preparation for its first npm release.
+Customizable React pointer bubbles for map markers, labels, annotations, and callouts.
 
-## Usage
+`PointerBubble` provides a lightweight visual marker with configurable sizing, colors, pointer tips, shadows, selection states, pulses, custom content, and styling hooks.
 
-After publication:
+## Installation
 
 ```sh
 npm install @moyarich/pointer-bubble
 ```
 
-Import the stylesheet once in your application entry point:
+Import the stylesheet once in your application:
 
 ```tsx
-import { PointerBubble } from '@moyarich/pointer-bubble';
-import '@moyarich/pointer-bubble/styles.css';
+import "@moyarich/pointer-bubble/styles.css";
+```
+
+## Quick Start
+
+```tsx
+import { PointerBubble } from "@moyarich/pointer-bubble";
+import "@moyarich/pointer-bubble/styles.css";
 
 export function LocationMarker() {
   return (
@@ -22,8 +28,8 @@ export function LocationMarker() {
       size="sm"
       backgroundColor="#79bd9a"
       borderColor="#18173b"
-      aria-label="Oak tree location"
       role="img"
+      aria-label="Oak tree location"
     >
       Oak
     </PointerBubble>
@@ -31,59 +37,378 @@ export function LocationMarker() {
 }
 ```
 
-The default appearance needs no Tailwind setup, font download, or map library. Styles are scoped to the component and use the CSS `components` layer so your styles can override them. Import your application's Tailwind stylesheet first when declaring a custom cascade layer order, or explicitly declare `@layer theme, base, components, utilities;` before other styles.
+## Features
+
+- Five built-in sizes
+- Custom bubble, border, text, and content colors
+- Optional pointer tip
+- Ground shadow
+- Selected state and selection ring
+- Animated selection pulse
+- Custom React content
+- Per-element styling hooks
+- Standard `div` attributes and refs
+- Reduced-motion support
 
 ## Props
 
-| Prop | Default | Purpose |
-| --- | --- | --- |
-| `children` | required | Text, icons, images, or other React content |
-| `size` | `md` | `xxs`, `xs`, `sm`, `md`, or `lg` |
-| `backgroundColor` | `#79bd9a` | Bubble fill |
-| `borderColor` | `#18173b` | Bubble and outer tip border |
-| `textColor` | `#ffffff` | Content color |
-| `selected` | `false` | Raised bubble and selection ring |
-| `selectedRingColor` | `#ffffff` | Selection ring color |
-| `showTip` | `true` | Show the triangle tip |
-| `showShadow` | `true` | Show the ground shadow below the bubble |
-| `shadowColor` | `rgba(0, 0, 0, 0.25)` | Ground shadow color |
-| `showPulse` | `false` | Animate a pulse when selected |
-| `pulseColor` | bubble fill | Pulse color |
-| `showContentBackground` | `true` | Show the inner content fill |
-| `contentBackgroundColor` | `rgba(255, 255, 255, 0.2)` | Inner fill |
-| `showContentBorder` | `true` | Show the inner content border |
-| `contentBorderColor` | `rgba(255, 255, 255, 0.4)` | Inner border |
+| Prop                     | Type                                    | Default                      | Description                                     |
+| ------------------------ | --------------------------------------- | ---------------------------- | ----------------------------------------------- |
+| `children`               | `ReactNode`                             | required                     | Content displayed inside the bubble             |
+| `size`                   | `"xxs" \| "xs" \| "sm" \| "md" \| "lg"` | `"md"`                       | Bubble size                                     |
+| `backgroundColor`        | `string`                                | `"#79bd9a"`                  | Bubble background color                         |
+| `borderColor`            | `string`                                | `"#18173b"`                  | Bubble border and outer tip color               |
+| `textColor`              | `string`                                | `"#ffffff"`                  | Content color                                   |
+| `selected`               | `boolean`                               | `false`                      | Raises the bubble and displays a selection ring |
+| `selectedRingColor`      | `string`                                | `"#ffffff"`                  | Selection ring color                            |
+| `showTip`                | `boolean`                               | `true`                       | Shows the pointer tip                           |
+| `showShadow`             | `boolean`                               | `true`                       | Shows the ground shadow                         |
+| `shadowColor`            | `string`                                | `"rgba(0, 0, 0, 0.25)"`      | Ground shadow color                             |
+| `showPulse`              | `boolean`                               | `false`                      | Shows a pulse while selected                    |
+| `pulseColor`             | `string`                                | bubble background            | Pulse color                                     |
+| `showContentBackground`  | `boolean`                               | `true`                       | Shows the inner content background              |
+| `contentBackgroundColor` | `string`                                | `"rgba(255, 255, 255, 0.2)"` | Inner content background color                  |
+| `showContentBorder`      | `boolean`                               | `true`                       | Shows the inner content border                  |
+| `contentBorderColor`     | `string`                                | `"rgba(255, 255, 255, 0.4)"` | Inner content border color                      |
+| `rootClass`              | `string`                                | —                            | Class for the outer wrapper                     |
+| `className`              | `string`                                | —                            | Class for the bubble body                       |
+| `contentClass`           | `string`                                | —                            | Class for the inner content                     |
+| `pulseClass`             | `string`                                | —                            | Class for the pulse                             |
+| `shadowClass`            | `string`                                | —                            | Class for the ground shadow                     |
+| `tipClass`               | `string`                                | —                            | Class for the tip wrapper                       |
+| `outerTipClass`          | `string`                                | —                            | Class for the outer tip                         |
+| `innerTipClass`          | `string`                                | —                            | Class for the inner tip                         |
 
-`rootClass`, `className`, `contentClass`, `pulseClass`, `shadowClass`, `tipClass`, `outerTipClass`, and `innerTipClass` customize individual slots. For compatibility with the playground, **`className` styles the bubble body; `rootClass` styles the outer wrapper**. `tipClass` also reaches the ground-shadow span, preserving the original behavior.
-
-Standard div attributes, event handlers, `style`, and a React 19 `ref` are passed to the outer wrapper. Use `aria-label` for icon-only content. PointerBubble is a presentational div; for interactive use, supply appropriate accessible interaction semantics or place it in a button.
-
-The pulse is decorative and disabled for reduced-motion preferences. `showShadow` controls the ground shadow; to remove the body's own shadow, use a custom body class. The component supports server rendering and does not access the browser during render.
-
-## Custom classes
-
-```css
-.my-bubble { border-radius: 1rem; box-shadow: none; }
-.my-content { padding: .5rem 1rem; }
-```
+`PointerBubbleProps` extends `React.ComponentPropsWithRef<"div">`, so standard `div` attributes, event handlers, ARIA attributes, `style`, and refs are supported.
 
 ```tsx
-<PointerBubble className="my-bubble" contentClass="my-content">
-  Your content
+<PointerBubble
+  id="tree-marker"
+  data-location-id="oak-12"
+  role="img"
+  aria-label="Oak tree"
+  onMouseEnter={() => console.log("hover")}
+>
+  Oak
 </PointerBubble>
 ```
 
-Tailwind users can keep the playground's utility-based customizations. Utilities in your own source must be compiled by your app; copied playground snippets that use utilities require Tailwind. Default utility classes are retained for conflict merging with `tailwind-merge`, with standalone CSS providing the default rendering when Tailwind is absent.
+## Sizes
 
-## Public exports
+```tsx
+<PointerBubble size="xxs">XXS</PointerBubble>
+<PointerBubble size="xs">XS</PointerBubble>
+<PointerBubble size="sm">SM</PointerBubble>
+<PointerBubble size="md">MD</PointerBubble>
+<PointerBubble size="lg">LG</PointerBubble>
+```
 
-- `PointerBubble`
-- `PointerBubbleProps` (TypeScript)
-- `PointerBubbleSize` (TypeScript)
-- `@moyarich/pointer-bubble/styles.css`
+The default size is `md`.
 
-Only React is a peer dependency. `clsx` and `tailwind-merge` are runtime dependencies. Map integration belongs in the consuming application; nothing in this package requires MapLibre or React DOM.
+Each size adjusts the bubble, content area, pointer tip, pulse, font size, and ground shadow together.
+
+## Selected State
+
+Use `selected` to raise the bubble and display its selection ring.
+
+```tsx
+<PointerBubble selected backgroundColor="#79bd9a" selectedRingColor="#ffffff">
+  Oak
+</PointerBubble>
+```
+
+The bubble also receives a subtle raised hover state on devices that support hover.
+
+## Selection Pulse
+
+Combine `selected` and `showPulse` to display an animated pulse:
+
+```tsx
+<PointerBubble selected showPulse pulseColor="#79bd9a">
+  Active
+</PointerBubble>
+```
+
+`showPulse` has no effect unless `selected` is also `true`.
+
+```tsx
+<PointerBubble showPulse>No pulse</PointerBubble>
+```
+
+The pulse is decorative and excluded from assistive technology. Its animation is disabled when the user prefers reduced motion.
+
+## Pointer Tip
+
+The pointer tip is enabled by default.
+
+```tsx
+<PointerBubble>Marker</PointerBubble>
+```
+
+Disable it with:
+
+```tsx
+<PointerBubble showTip={false}>Label</PointerBubble>
+```
+
+The tip automatically uses the current `backgroundColor` and `borderColor`.
+
+## Shadow
+
+A ground shadow is displayed beneath the bubble by default.
+
+```tsx
+<PointerBubble shadowColor="rgba(0, 0, 0, 0.2)">Marker</PointerBubble>
+```
+
+Disable it with:
+
+```tsx
+<PointerBubble showShadow={false}>Marker</PointerBubble>
+```
+
+`showShadow` controls the ground shadow only. The bubble body has its own elevation shadow.
+
+To remove that shadow as well:
+
+```css
+.no-body-shadow {
+  box-shadow: none;
+}
+```
+
+```tsx
+<PointerBubble showShadow={false} className="no-body-shadow">
+  Flat
+</PointerBubble>
+```
+
+## Content Appearance
+
+The inner content area includes a translucent background and border by default.
+
+Customize them:
+
+```tsx
+<PointerBubble
+  contentBackgroundColor="rgba(255, 255, 255, 0.3)"
+  contentBorderColor="rgba(255, 255, 255, 0.6)"
+>
+  Oak
+</PointerBubble>
+```
+
+Or disable them independently:
+
+```tsx
+<PointerBubble showContentBackground={false} showContentBorder={false}>
+  Oak
+</PointerBubble>
+```
+
+## Custom Content
+
+`children` accepts any React content.
+
+```tsx
+<PointerBubble size="sm">
+  <span>
+    <span aria-hidden="true">🌳</span>
+    Oak
+  </span>
+</PointerBubble>
+```
+
+Images and custom components work as well:
+
+```tsx
+<PointerBubble size="md">
+  <img src="/avatar.jpg" alt="" width={32} height={32} />
+</PointerBubble>
+```
+
+```tsx
+function TreeCount({ count }: { count: number }) {
+  return <span>{count} trees</span>;
+}
+
+<PointerBubble>
+  <TreeCount count={12} />
+</PointerBubble>;
+```
+
+## Styling
+
+Each major visual element has its own styling hook:
+
+```text
+PointerBubble
+│
+├── rootClass
+├── pulseClass
+├── className
+│   ├── tipClass
+│   │   ├── outerTipClass
+│   │   └── innerTipClass
+│   └── contentClass
+└── shadowClass
+```
+
+The two most commonly used hooks are:
+
+- `rootClass` — styles the outer wrapper
+- `className` — styles the visible bubble body
+
+Example:
+
+```css
+.my-marker {
+  margin: 1rem;
+}
+
+.my-bubble {
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+.my-content {
+  padding: 0.5rem 1rem;
+}
+```
+
+```tsx
+<PointerBubble
+  rootClass="my-marker"
+  className="my-bubble"
+  contentClass="my-content"
+>
+  Custom marker
+</PointerBubble>
+```
+
+## Inline Styles
+
+The `style` prop is applied to the outer wrapper.
+
+```tsx
+<PointerBubble
+  style={{
+    margin: "1rem",
+    zIndex: 20,
+  }}
+>
+  Marker
+</PointerBubble>
+```
+
+## Map Usage
+
+`PointerBubble` is map-library agnostic. Render it inside the marker system provided by your preferred mapping library.
+
+```tsx
+function MapMarker() {
+  return (
+    <PointerBubble
+      size="xs"
+      backgroundColor="#2563eb"
+      borderColor="#172554"
+      selected
+      showPulse
+      role="img"
+      aria-label="Selected location"
+    >
+      A
+    </PointerBubble>
+  );
+}
+```
+
+## Accessibility
+
+`PointerBubble` renders a `div`.
+
+For non-interactive markers that convey information, provide appropriate accessible semantics:
+
+```tsx
+<PointerBubble role="img" aria-label="Oak tree location">
+  Oak
+</PointerBubble>
+```
+
+For interactive markers, place the bubble inside a semantic interactive element:
+
+```tsx
+<button
+  type="button"
+  aria-label="Select Oak tree location"
+  onClick={() => selectLocation("oak")}
+>
+  <PointerBubble>Oak</PointerBubble>
+</button>
+```
+
+Decorative pointer, shadow, and pulse elements are hidden from assistive technology.
+
+## Ref
+
+Refs are forwarded to the outer `div`.
+
+```tsx
+import { useRef } from "react";
+import { PointerBubble } from "@moyarich/pointer-bubble";
+
+export function Marker() {
+  const markerRef = useRef<HTMLDivElement>(null);
+
+  return <PointerBubble ref={markerRef}>Oak</PointerBubble>;
+}
+```
+
+## TypeScript
+
+The package exports the component and its public types:
+
+```tsx
+import {
+  PointerBubble,
+  type PointerBubbleProps,
+  type PointerBubbleSize,
+} from "@moyarich/pointer-bubble";
+```
+
+Example:
+
+```tsx
+import type {
+  PointerBubbleProps,
+  PointerBubbleSize,
+} from "@moyarich/pointer-bubble";
+
+const size: PointerBubbleSize = "sm";
+
+const markerProps: PointerBubbleProps = {
+  children: "Oak",
+  size,
+  backgroundColor: "#79bd9a",
+};
+```
+
+## Public Exports
+
+```ts
+PointerBubble;
+PointerBubbleProps;
+PointerBubbleSize;
+```
+
+Styles are exported separately:
+
+```tsx
+import "@moyarich/pointer-bubble/styles.css";
+```
 
 ## License
 
-MIT © 2026 Moya Richards. See [LICENSE](LICENSE).
+MIT © 2026 Moya Richards.
+
+See [LICENSE](LICENSE).
