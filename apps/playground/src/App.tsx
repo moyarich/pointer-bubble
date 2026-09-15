@@ -1,5 +1,6 @@
 import { SharedPlaygroundDrawerHost } from "./components/drawer/PlaygroundDrawer";
 import { PlaygroundExamples } from "./components/examples/PlaygroundExamples";
+import { RenderedBubbleInspector } from "./components/preview/RenderedBubbleInspector";
 import "./components/playground.css";
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
             preset tone prop is needed.
           </p>
         </header>
+        <RenderedBubbleInspector />
         <PlaygroundExamples />
         <SharedPlaygroundDrawerHost />
       </div>
