@@ -7,7 +7,7 @@ import * as maplibregl from "../maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { PlaygroundDrawerTrigger } from "../drawer/PlaygroundDrawer";
 import { InlineShieldSvg } from "./InlineShieldSvg";
-import { exampleSource } from "./exampleSource";
+import { findExampleSource } from "@/utils/findExampleSource";
 type PinItem = {
   id: number;
   name: string;
@@ -112,7 +112,7 @@ function DemoMapShell({
   );
 }
 
-const simpleMapPinsDemoCode = exampleSource("maps/simple-map-pins");
+const simpleMapPinsDemoCode = findExampleSource("maps/simple-map-pins");
 
 function SimpleMapPinsPreview() {
   return (
@@ -168,7 +168,7 @@ export function SimpleMapPinsDemo() {
   );
 }
 
-const multiPinMapDemoCode = exampleSource("maps/multi-pin-map");
+const multiPinMapDemoCode = findExampleSource("maps/multi-pin-map");
 
 function MultiPinMapPreview() {
   return (
@@ -221,7 +221,7 @@ export function MultiPinMapDemo() {
   );
 }
 
-const mapLibrePinsDemoCode = exampleSource("maps/map-libre-pins");
+const mapLibrePinsDemoCode = findExampleSource("maps/map-libre-pins");
 
 function MapLibreMapView() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);

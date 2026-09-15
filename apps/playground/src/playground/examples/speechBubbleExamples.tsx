@@ -1,6 +1,6 @@
 import { PointerBubble, type PointerBubbleProps } from "@moyarich/pointer-bubble";
 import { PlaygroundDrawerTrigger } from "../drawer/PlaygroundDrawer";
-import { exampleSource } from "./exampleSource";
+import { findExampleSource } from "@/utils/findExampleSource";
 
 const speechBubbles: Array<{
   id: string;
@@ -24,7 +24,7 @@ const speechBubbles: Array<{
       children:
         "This same component can also work as a speech bubble with a bottom pointer.",
     },
-    sourceCode: exampleSource("markers/default-speech-bubble"),
+    sourceCode: findExampleSource("markers/default-speech-bubble"),
   },
   {
     id: "Pill Speech Bubble",
@@ -41,7 +41,7 @@ const speechBubbles: Array<{
       contentClass: "min-h-0 min-w-0 px-0 text-center leading-relaxed",
       children: "A very rounded pill-style speech bubble.",
     },
-    sourceCode: exampleSource("markers/pill-speech-bubble"),
+    sourceCode: findExampleSource("markers/pill-speech-bubble"),
   },
   {
     id: "Left Tail Bubble",
@@ -60,7 +60,7 @@ const speechBubbles: Array<{
       children:
         "The tail can move left by overriding the triangle classes with cn().",
     },
-    sourceCode: exampleSource("markers/left-tail-bubble"),
+    sourceCode: findExampleSource("markers/left-tail-bubble"),
   },
   {
     id: "Right Tail Bubble",
@@ -79,7 +79,7 @@ const speechBubbles: Array<{
       children:
         "This example moves the tail to the right side for sent-message layouts.",
     },
-    sourceCode: exampleSource("markers/right-tail-bubble"),
+    sourceCode: findExampleSource("markers/right-tail-bubble"),
   },
   {
     id: "Alert Bubble",
@@ -98,7 +98,7 @@ const speechBubbles: Array<{
       children:
         "Speech bubbles can still use the content fill and border when you want an inset message style.",
     },
-    sourceCode: exampleSource("markers/alert-bubble"),
+    sourceCode: findExampleSource("markers/alert-bubble"),
   },
   {
     id: "Red Hollow Teardrop Pin",
@@ -118,7 +118,7 @@ const speechBubbles: Array<{
       shadowClass: "mt-8 h-2.5 w-11 bg-slate-950/15",
       children: <span className="sr-only">Red hollow teardrop pin</span>,
     },
-    sourceCode: exampleSource("markers/red-hollow-teardrop-pin"),
+    sourceCode: findExampleSource("markers/red-hollow-teardrop-pin"),
   },
   {
     id: "Red Rounded Hollow Pin",
@@ -138,7 +138,7 @@ const speechBubbles: Array<{
       shadowClass: "mt-8 h-2.5 w-11 bg-slate-950/15",
       children: <span className="sr-only">Red rounded hollow pin</span>,
     },
-    sourceCode: exampleSource("markers/red-rounded-hollow-pin"),
+    sourceCode: findExampleSource("markers/red-rounded-hollow-pin"),
   },
   {
     id: "Red Small Hole Pin",
@@ -158,7 +158,7 @@ const speechBubbles: Array<{
       shadowClass: "mt-8 h-2.5 w-10 bg-slate-950/15",
       children: <span className="sr-only">Red small hole pin</span>,
     },
-    sourceCode: exampleSource("markers/red-small-hole-pin"),
+    sourceCode: findExampleSource("markers/red-small-hole-pin"),
   },
   {
     id: "Red Outline Callout Pin",
@@ -183,7 +183,7 @@ const speechBubbles: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/red-outline-callout-pin"),
+    sourceCode: findExampleSource("markers/red-outline-callout-pin"),
   },
 ];
 

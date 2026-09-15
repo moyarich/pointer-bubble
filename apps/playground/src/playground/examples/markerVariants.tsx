@@ -3,7 +3,7 @@ import { Check, Leaf, Sprout, X } from "lucide-react";
 import { PointerBubble, type PointerBubbleProps, type PointerBubbleSize } from "@moyarich/pointer-bubble";
 import { PlaygroundDrawerTrigger } from "../drawer/PlaygroundDrawer";
 import { InlineShieldSvg } from "./InlineShieldSvg";
-import { exampleSource } from "./exampleSource";
+import { findExampleSource } from "@/utils/findExampleSource";
 
 const featureVariants: Array<{
   id: string;
@@ -28,7 +28,7 @@ const featureVariants: Array<{
       shadowClass: "mt-6 h-2.5 w-10 bg-red-950/25",
       children: <span className="h-3 w-3 rounded-full bg-red-500" />,
     },
-    sourceCode: exampleSource("markers/google-map-pin"),
+    sourceCode: findExampleSource("markers/google-map-pin"),
   },
   {
     id: "Red Outline Target Pin",
@@ -48,7 +48,7 @@ const featureVariants: Array<{
       shadowClass: "mt-7 h-2 w-9 bg-rose-950/15",
       children: <span className="sr-only">Red outline target pin</span>,
     },
-    sourceCode: exampleSource("markers/red-outline-target-pin"),
+    sourceCode: findExampleSource("markers/red-outline-target-pin"),
   },
   {
     id: "Compact Red Outline Target Pin",
@@ -90,7 +90,7 @@ const featureVariants: Array<{
         </svg>
       ),
     },
-    sourceCode: exampleSource("markers/compact-red-outline-target-pin"),
+    sourceCode: findExampleSource("markers/compact-red-outline-target-pin"),
   },
   {
     id: "Simple Circle Number Marker",
@@ -110,7 +110,7 @@ const featureVariants: Array<{
       shadowClass: "mt-3 h-2 w-8 bg-blue-950/20",
       children: "5",
     },
-    sourceCode: exampleSource("markers/simple-circle-number-marker"),
+    sourceCode: findExampleSource("markers/simple-circle-number-marker"),
   },
   {
     id: "Simple Circle Outline Number Marker",
@@ -130,7 +130,7 @@ const featureVariants: Array<{
       shadowClass: "mt-3 h-2 w-8 bg-blue-950/15",
       children: "5",
     },
-    sourceCode: exampleSource("markers/simple-circle-outline-number-marker"),
+    sourceCode: findExampleSource("markers/simple-circle-outline-number-marker"),
   },
   {
     id: "Red Letter Teardrop Marker",
@@ -150,7 +150,7 @@ const featureVariants: Array<{
       shadowClass: "mt-7 h-2.5 w-10 bg-red-950/20",
       children: "B",
     },
-    sourceCode: exampleSource("markers/red-letter-teardrop-marker"),
+    sourceCode: findExampleSource("markers/red-letter-teardrop-marker"),
   },
   {
     id: "Blue Outline Number Marker",
@@ -170,7 +170,7 @@ const featureVariants: Array<{
       shadowClass: "mt-7 h-2.5 w-10 bg-blue-950/15",
       children: "5",
     },
-    sourceCode: exampleSource("markers/blue-outline-number-marker"),
+    sourceCode: findExampleSource("markers/blue-outline-number-marker"),
   },
   {
     id: "OpenStreetMap.org Marker",
@@ -189,7 +189,7 @@ const featureVariants: Array<{
       shadowClass: "mt-6 h-2.5 w-10 bg-slate-950/25",
       children: <span className="h-2.5 w-2.5 rounded-full bg-white" />,
     },
-    sourceCode: exampleSource("markers/open-street-map-org-marker"),
+    sourceCode: findExampleSource("markers/open-street-map-org-marker"),
   },
   {
     id: "OpenStreetMap Check Marker",
@@ -213,7 +213,7 @@ const featureVariants: Array<{
         />
       ),
     },
-    sourceCode: exampleSource("markers/open-street-map-check-marker"),
+    sourceCode: findExampleSource("markers/open-street-map-check-marker"),
   },
   {
     id: "OpenStreetMap X Marker",
@@ -237,7 +237,7 @@ const featureVariants: Array<{
         />
       ),
     },
-    sourceCode: exampleSource("markers/open-street-map-x-marker"),
+    sourceCode: findExampleSource("markers/open-street-map-x-marker"),
   },
   {
     id: "Sketch Hollow Pin - Clean Scratches",
@@ -316,7 +316,7 @@ const featureVariants: Array<{
         </svg>
       ),
     },
-    sourceCode: exampleSource("markers/sketch-hollow-pin-clean-scratches"),
+    sourceCode: findExampleSource("markers/sketch-hollow-pin-clean-scratches"),
   },
   {
     id: "Sketch Hollow Pin - Messy Scratches",
@@ -536,7 +536,7 @@ const featureVariants: Array<{
         </svg>
       ),
     },
-    sourceCode: exampleSource("markers/sketch-hollow-pin-messy-scratches"),
+    sourceCode: findExampleSource("markers/sketch-hollow-pin-messy-scratches"),
   },
   {
     id: "Hollow Teardrop Pin",
@@ -556,7 +556,7 @@ const featureVariants: Array<{
       shadowClass: "mt-7 h-2.5 w-10 bg-slate-950/25",
       children: <span className="sr-only">Hollow teardrop marker</span>,
     },
-    sourceCode: exampleSource("markers/hollow-teardrop-pin"),
+    sourceCode: findExampleSource("markers/hollow-teardrop-pin"),
   },
   {
     id: "Lollipop Pin",
@@ -580,7 +580,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/lollipop-pin"),
+    sourceCode: findExampleSource("markers/lollipop-pin"),
   },
   {
     id: "Needle Drop Pin",
@@ -604,7 +604,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/needle-drop-pin"),
+    sourceCode: findExampleSource("markers/needle-drop-pin"),
   },
   {
     id: "Ring Dot Pin",
@@ -624,7 +624,7 @@ const featureVariants: Array<{
       shadowClass: "mt-7 h-2.5 w-10 bg-slate-950/25",
       children: <span className="h-6 w-6 rounded-full bg-black" />,
     },
-    sourceCode: exampleSource("markers/ring-dot-pin"),
+    sourceCode: findExampleSource("markers/ring-dot-pin"),
   },
   {
     id: "Flag Marker",
@@ -649,7 +649,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/flag-marker"),
+    sourceCode: findExampleSource("markers/flag-marker"),
   },
   {
     id: "Rounded Signpost Marker",
@@ -674,7 +674,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/rounded-signpost-marker"),
+    sourceCode: findExampleSource("markers/rounded-signpost-marker"),
   },
   {
     id: "Circle Signpost Marker",
@@ -698,7 +698,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/circle-signpost-marker"),
+    sourceCode: findExampleSource("markers/circle-signpost-marker"),
   },
   {
     id: "Teal Square Drop Marker",
@@ -722,7 +722,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/teal-square-drop-marker"),
+    sourceCode: findExampleSource("markers/teal-square-drop-marker"),
   },
   {
     id: "Yellow Spotlight Marker",
@@ -747,7 +747,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/yellow-spotlight-marker"),
+    sourceCode: findExampleSource("markers/yellow-spotlight-marker"),
   },
   {
     id: "Yellow Hollow Location Marker",
@@ -768,7 +768,7 @@ const featureVariants: Array<{
         "mt-2 h-12 w-28 rounded-[50%] border-[10px] border-black/90 border-t-transparent bg-transparent blur-[1px]",
       children: <span className="sr-only">Yellow hollow location marker</span>,
     },
-    sourceCode: exampleSource("markers/yellow-hollow-location-marker"),
+    sourceCode: findExampleSource("markers/yellow-hollow-location-marker"),
   },
   {
     id: "Red Pushpin Marker",
@@ -795,7 +795,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/red-pushpin-marker"),
+    sourceCode: findExampleSource("markers/red-pushpin-marker"),
   },
   {
     id: "Angled Pushpin Marker",
@@ -823,7 +823,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/angled-pushpin-marker"),
+    sourceCode: findExampleSource("markers/angled-pushpin-marker"),
   },
   {
     id: "Photo Marker",
@@ -849,7 +849,7 @@ const featureVariants: Array<{
         />
       ),
     },
-    sourceCode: exampleSource("markers/photo-marker"),
+    sourceCode: findExampleSource("markers/photo-marker"),
   },
   {
     id: "Text Label",
@@ -860,7 +860,7 @@ const featureVariants: Array<{
       selected: true,
       children: "Mint",
     },
-    sourceCode: exampleSource("markers/text-label"),
+    sourceCode: findExampleSource("markers/text-label"),
   },
   {
     id: "Lucide Icon",
@@ -870,7 +870,7 @@ const featureVariants: Array<{
       borderColor: "#14532d",
       children: <Leaf className="h-5 w-5" strokeWidth={3} />,
     },
-    sourceCode: exampleSource("markers/lucide-icon"),
+    sourceCode: findExampleSource("markers/lucide-icon"),
   },
   {
     id: "Inline SVG",
@@ -881,7 +881,7 @@ const featureVariants: Array<{
       textColor: "#422006",
       children: <InlineShieldSvg />,
     },
-    sourceCode: exampleSource("markers/inline-svg"),
+    sourceCode: findExampleSource("markers/inline-svg"),
   },
   {
     id: "Berry No Content Fill",
@@ -893,7 +893,7 @@ const featureVariants: Array<{
       showContentBorder: false,
       children: "Berry",
     },
-    sourceCode: exampleSource("markers/berry-no-content-fill"),
+    sourceCode: findExampleSource("markers/berry-no-content-fill"),
   },
   {
     id: "No Shadow",
@@ -904,7 +904,7 @@ const featureVariants: Array<{
       showShadow: false,
       children: "No",
     },
-    sourceCode: exampleSource("markers/no-shadow"),
+    sourceCode: findExampleSource("markers/no-shadow"),
   },
   {
     id: "Selected + Pulse",
@@ -916,7 +916,7 @@ const featureVariants: Array<{
       showPulse: true,
       children: "Pulse",
     },
-    sourceCode: exampleSource("markers/selected-pulse"),
+    sourceCode: findExampleSource("markers/selected-pulse"),
   },
   {
     id: "Custom Long Text Expands",
@@ -928,7 +928,7 @@ const featureVariants: Array<{
       contentClass: "max-w-[9rem] px-2 py-1",
       children: "pulse is a separate visual layer",
     },
-    sourceCode: exampleSource("markers/custom-long-text-expands"),
+    sourceCode: findExampleSource("markers/custom-long-text-expands"),
   },
   {
     id: "Body Class Override",
@@ -939,7 +939,7 @@ const featureVariants: Array<{
       className: "rounded-2xl rotate-2",
       children: "Boxy",
     },
-    sourceCode: exampleSource("markers/body-class-override"),
+    sourceCode: findExampleSource("markers/body-class-override"),
   },
   {
     id: "Tip Class Override",
@@ -951,7 +951,7 @@ const featureVariants: Array<{
       innerTipClass: "-mt-1",
       children: "Tip",
     },
-    sourceCode: exampleSource("markers/tip-class-override"),
+    sourceCode: findExampleSource("markers/tip-class-override"),
   },
   {
     id: "Red Rounded Hollow Pin",
@@ -971,7 +971,7 @@ const featureVariants: Array<{
       shadowClass: "mt-8 h-2.5 w-11 bg-slate-950/15",
       children: <span className="sr-only">Red rounded hollow pin</span>,
     },
-    sourceCode: exampleSource("markers/red-rounded-hollow-pin"),
+    sourceCode: findExampleSource("markers/red-rounded-hollow-pin"),
   },
   {
     id: "Red Small Hole Pin",
@@ -991,7 +991,7 @@ const featureVariants: Array<{
       shadowClass: "mt-8 h-2.5 w-10 bg-slate-950/15",
       children: <span className="sr-only">Red small hole pin</span>,
     },
-    sourceCode: exampleSource("markers/red-small-hole-pin"),
+    sourceCode: findExampleSource("markers/red-small-hole-pin"),
   },
   {
     id: "Red Outline Callout Pin",
@@ -1016,7 +1016,7 @@ const featureVariants: Array<{
         </>
       ),
     },
-    sourceCode: exampleSource("markers/red-outline-callout-pin"),
+    sourceCode: findExampleSource("markers/red-outline-callout-pin"),
   },
 ];
 
@@ -1032,35 +1032,35 @@ const sizeVariants: Array<{
     label: "XXS Size",
     size: "xxs",
     content: <Sprout className="h-3 w-3" strokeWidth={3} />,
-    sourceCode: exampleSource("markers/xxs-size"),
+    sourceCode: findExampleSource("markers/xxs-size"),
   },
   {
     id: "XS Size",
     label: "XS Size",
     size: "xs",
     content: <Sprout className="h-3.5 w-3.5" strokeWidth={3} />,
-    sourceCode: exampleSource("markers/xs-size"),
+    sourceCode: findExampleSource("markers/xs-size"),
   },
   {
     id: "SM Size",
     label: "SM Size",
     size: "sm",
     content: <Leaf className="h-4 w-4" strokeWidth={3} />,
-    sourceCode: exampleSource("markers/sm-size"),
+    sourceCode: findExampleSource("markers/sm-size"),
   },
   {
     id: "MD Size",
     label: "MD Size",
     size: "md",
     content: "Md",
-    sourceCode: exampleSource("markers/md-size"),
+    sourceCode: findExampleSource("markers/md-size"),
   },
   {
     id: "LG Size",
     label: "LG Size",
     size: "lg",
     content: "Lg",
-    sourceCode: exampleSource("markers/lg-size"),
+    sourceCode: findExampleSource("markers/lg-size"),
   },
 ];
 

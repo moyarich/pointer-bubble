@@ -6,4 +6,4 @@ They intentionally live outside `src/`: they are consumer-facing snippets, not p
 
 Each example assumes the application has imported `@moyarich/pointer-bubble/styles.css` once. Examples that use utility classes also assume Tailwind CSS is available in the consuming app.
 
-Do not duplicate example code inside playground components. Add or edit the real example file here, then reference it through `exampleSource(...)` from the playground metadata.
+Do not duplicate example code inside playground components. Add or edit the real example file here, then reference it through `findExampleSource(...)` from the playground metadata.
