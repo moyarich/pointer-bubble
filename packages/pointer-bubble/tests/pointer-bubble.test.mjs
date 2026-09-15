@@ -35,12 +35,12 @@ test('passes accessible DOM attributes and styles to the root without leaking co
   assert.doesNotMatch(html, /backgroundColor=/);
 });
 
-test('keeps slot classes and resolves conflicting Tailwind utilities', () => {
-  const html = render({className:'border-0 p-0', rootClass:'custom-root', contentClass:'custom-content'});
-  assert.match(html, /custom-root/);
-  assert.match(html, /custom-content/);
-  assert.match(html, /border-0/);
-  assert.doesNotMatch(html, /border-\[6px\]|px-3 py-2/);
+test('keeps semantic and consumer classes without embedding Tailwind defaults in markup', () => {
+  const html = render({className:'custom-body border-0 p-0', rootClass:'custom-root', contentClass:'custom-content'});
+  assert.match(html, /better-map-marker custom-root/);
+  assert.match(html, /pb-body custom-body border-0 p-0/);
+  assert.match(html, /pb-content custom-content/);
+  assert.doesNotMatch(html, /min-h-|rounded-full|bg-\[var\(|border-\[/);
 });
 
 test('CommonJS and ESM consumers render the same component', () => {
@@ -49,7 +49,7 @@ test('CommonJS and ESM consumers render the same component', () => {
   assert.equal(renderToStaticMarkup(createElement(cjs.PointerBubble, null, 'Oak')), render());
 });
 
-test('release entry auto-loads styles in browsers while remaining SSR-safe', () => {
+test('release entry auto-loads standalone CSS while remaining SSR-safe', () => {
   const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
   const bundle = readFileSync(new URL('../dist/index.js', import.meta.url), 'utf8');
   assert.doesNotMatch(bundle, /monaco|maplibre|lucide|react-dom|window\./);
@@ -58,7 +58,11 @@ test('release entry auto-loads styles in browsers while remaining SSR-safe', () 
   assert.equal(pkg.exports['./styles.css'], './dist/styles.css');
   assert.deepEqual(pkg.sideEffects, ['**/*.css', './dist/index.js', './dist/index.cjs']);
   assert.equal(pkg.peerDependencies.react, '>=18.2.0');
+  assert.deepEqual(pkg.dependencies, { clsx: '^2.1.1' });
   const css = readFileSync(new URL('../dist/styles.css', import.meta.url), 'utf8');
+  assert.match(css, /\.pb-body/);
+  assert.match(css, /\.pb-content/);
+  assert.match(css, /\.pb-tip-outer/);
   assert.match(css, /prefers-reduced-motion/);
   assert.doesNotMatch(css, /:root|(?:^|\n)\s*body\s*\{|@import/);
 });
