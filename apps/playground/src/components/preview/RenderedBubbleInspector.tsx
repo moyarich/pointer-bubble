@@ -144,7 +144,7 @@ export function RenderedBubbleInspector() {
   if (!host) return null;
 
   return createPortal(
-    <div {...{ [inspectorAttribute]: "" }} className="mt-3 min-h-[16rem]">
+    <div data-rendered-output-inspector="" className="mt-3 min-h-[16rem]">
       <RenderedOutputPanel output={output} />
     </div>,
     host,
