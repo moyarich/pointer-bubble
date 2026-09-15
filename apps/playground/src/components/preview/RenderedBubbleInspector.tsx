@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Code2, MousePointer2 } from "lucide-react";
 
@@ -8,21 +8,18 @@ import { RenderedOutputPanel } from "./RenderedOutputPanel";
 export function RenderedBubbleInspector() {
   const [output, setOutput] = useState<RenderedOutput | null>(null);
   const [selectedLabel, setSelectedLabel] = useState("First rendered PointerBubble");
-  const selectedRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     function capture(element: HTMLElement | null) {
       if (!element) return;
-      selectedRef.current = element;
       setSelectedLabel(
         element.textContent?.trim().replace(/\s+/g, " ").slice(0, 70) ||
           "Rendered PointerBubble",
       );
-      setOutput(createRenderedOutput(element.parentElement ?? document));
+      setOutput(createRenderedOutput(element));
     }
 
-    const firstBubble = document.querySelector<HTMLElement>(".better-map-marker");
-    capture(firstBubble);
+    capture(document.querySelector<HTMLElement>(".better-map-marker"));
 
     function handlePointerBubbleClick(event: MouseEvent) {
       const target = event.target;
@@ -30,24 +27,8 @@ export function RenderedBubbleInspector() {
       capture(target.closest<HTMLElement>(".better-map-marker"));
     }
 
-    const observer = new MutationObserver(() => {
-      const selected = selectedRef.current;
-      if (!selected?.isConnected) return;
-      setOutput(createRenderedOutput(selected.parentElement ?? document));
-    });
-
-    observer.observe(document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
     document.addEventListener("click", handlePointerBubbleClick, true);
-
-    return () => {
-      observer.disconnect();
-      document.removeEventListener("click", handlePointerBubbleClick, true);
-    };
+    return () => document.removeEventListener("click", handlePointerBubbleClick, true);
   }, []);
 
   return (
