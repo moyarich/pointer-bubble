@@ -1,6 +1,6 @@
-import { SharedPlaygroundDrawerHost } from "./playground/drawer/PlaygroundDrawer";
-import { PlaygroundExamples } from "./playground/examples/PlaygroundExamples";
-import "./playground/playground.css";
+import { SharedPlaygroundDrawerHost } from "./components/drawer/PlaygroundDrawer";
+import { PlaygroundExamples } from "./components/examples/PlaygroundExamples";
+import "./components/playground.css";
 
 export default function App() {
   return (
