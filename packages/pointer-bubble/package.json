@@ -1,0 +1,51 @@
+{
+  "name": "@moyarich/pointer-bubble",
+  "version": "0.1.0",
+  "description": "Customizable React pointer bubbles for map markers, labels, and callouts.",
+  "author": "Moya Richards",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "scripts": {
+    "build": "vite build --config vite.config.ts && tsc -p tsconfig.build.json && node scripts/write-cjs-types.mjs",
+    "prepack": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moyarich/pointer-bubble.git",
+    "directory": "packages/pointer-bubble"
+  },
+  "homepage": "https://github.com/moyarich/pointer-bubble#readme",
+  "bugs": {
+    "url": "https://github.com/moyarich/pointer-bubble/issues"
+  }
+}

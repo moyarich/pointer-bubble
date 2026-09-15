@@ -1,0 +1,14 @@
+.monaco-hover,
+        .monaco-hover-content,
+        .monaco-editor-hover,
+        .monaco-editor .suggest-widget,
+        .monaco-editor .parameter-hints-widget,
+        .monaco-editor .context-view,
+        .monaco-editor .monaco-list {
+          z-index: 999999 !important;
+        }
+        .monaco-editor,
+        .monaco-editor-background,
+        .monaco-editor .inputarea.ime-input {
+          overflow: visible !important;
+        }
