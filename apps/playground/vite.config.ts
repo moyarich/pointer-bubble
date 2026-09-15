@@ -8,14 +8,23 @@ export default defineConfig({
   base: process.env.PLAYGROUND_BASE_PATH || "/",
   plugins: [tailwindcss(), react()],
   resolve: {
-    alias: {
-      "@moyarich/pointer-bubble/styles.css": fileURLToPath(
-        new URL("../../packages/pointer-bubble/src/styles.css", import.meta.url),
-      ),
-      "@moyarich/pointer-bubble": fileURLToPath(
-        new URL("../../packages/pointer-bubble/src/index.ts", import.meta.url),
-      ),
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
+    alias: [
+      {
+        find: /^@moyarich\/pointer-bubble\/styles\.css(?=\?|$)/,
+        replacement: fileURLToPath(
+          new URL("../../packages/pointer-bubble/src/styles.css", import.meta.url),
+        ),
+      },
+      {
+        find: "@moyarich/pointer-bubble",
+        replacement: fileURLToPath(
+          new URL("../../packages/pointer-bubble/src/index.ts", import.meta.url),
+        ),
+      },
+      {
+        find: "@",
+        replacement: fileURLToPath(new URL("./src", import.meta.url)),
+      },
+    ],
   },
 });

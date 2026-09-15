@@ -1,4 +1,4 @@
-import pointerBubbleStyles from "../../../packages/pointer-bubble/src/styles.css?inline";
+import pointerBubbleStyles from "@moyarich/pointer-bubble/styles.css?inline";
 const ESBUILD_VERSION = "0.27.0";
 const ESBUILD_MODULE_URL = `https://esm.sh/esbuild-wasm@${ESBUILD_VERSION}`;
 const ESBUILD_WASM_URL = `https://cdn.jsdelivr.net/npm/esbuild-wasm@${ESBUILD_VERSION}/esbuild.wasm`;
