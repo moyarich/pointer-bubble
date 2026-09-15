@@ -16,9 +16,9 @@ export default function App() {
             preset tone prop is needed.
           </p>
         </header>
-        <RenderedBubbleInspector />
         <PlaygroundExamples />
         <SharedPlaygroundDrawerHost />
+        <RenderedBubbleInspector />
       </div>
     </div>
   );
