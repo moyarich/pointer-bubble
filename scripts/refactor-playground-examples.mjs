@@ -2,8 +2,9 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 const root = process.cwd();
-const playgroundSrc = join(root, "apps/playground/src");
-const sourceRoot = join(playgroundSrc, "examples");
+const playgroundRoot = join(root, "apps/playground");
+const playgroundSrc = join(playgroundRoot, "src");
+const sourceRoot = join(playgroundRoot, "examples");
 const playgroundExamplesRoot = join(playgroundSrc, "playground/examples");
 
 function slugify(value) {
@@ -115,7 +116,7 @@ writeFileSync(mapPath, mapText);
 
 writeFileSync(
   join(playgroundExamplesRoot, "exampleSource.ts"),
-  `/// <reference types="vite/client" />\n\nconst sources = import.meta.glob<string>("../../examples/**/*.tsx", {\n  query: "?raw",\n  import: "default",\n  eager: true,\n});\n\nexport function exampleSource(path: string) {\n  const key = \`../../examples/\${path}.tsx\`;\n  const source = sources[key];\n\n  if (typeof source !== "string") {\n    throw new Error(\`Unknown playground example source: \${path}\`);\n  }\n\n  return source;\n}\n`,
+  `/// <reference types="vite/client" />\n\nconst sources = import.meta.glob<string>("../../../examples/**/*.tsx", {\n  query: "?raw",\n  import: "default",\n  eager: true,\n});\n\nexport function exampleSource(path: string) {\n  const key = \`../../../examples/\${path}.tsx\`;\n  const source = sources[key];\n\n  if (typeof source !== "string") {\n    throw new Error(\`Unknown playground example source: \${path}\`);\n  }\n\n  return source;\n}\n`,
 );
 
 writeFileSync(
@@ -131,7 +132,7 @@ writeFileSync(
 
 writeFileSync(
   join(sourceRoot, "README.md"),
-  `# Playground examples\n\nThese files are the copyable React examples shown by the playground code drawer. The playground imports them as raw source, so the code visible in GitHub is the same code users see in the editor.\n\nEach example assumes the application has imported \`@moyarich/pointer-bubble/styles.css\` once. Examples that use utility classes also assume Tailwind CSS is available in the consuming app.\n\nDo not duplicate example code inside playground components. Add or edit the real example file here, then reference it through \`exampleSource(...)\` from the playground metadata.\n`,
+  `# Playground examples\n\nThese files are the copyable React examples shown by the playground code drawer. The playground imports them as raw source, so the code visible in GitHub is the same code users see in the editor.\n\nThey intentionally live outside \`src/\`: they are consumer-facing snippets, not playground implementation modules, so the playground TypeScript build does not impose its internal types on them.\n\nEach example assumes the application has imported \`@moyarich/pointer-bubble/styles.css\` once. Examples that use utility classes also assume Tailwind CSS is available in the consuming app.\n\nDo not duplicate example code inside playground components. Add or edit the real example file here, then reference it through \`exampleSource(...)\` from the playground metadata.\n`,
 );
 
 const devReadmePath = join(root, "docs/README-dev.md");
@@ -140,7 +141,7 @@ const marker = "## Playground notes\n";
 if (devReadme.includes(marker) && !devReadme.includes("## Example source architecture")) {
   devReadme = devReadme.replace(
     marker,
-    `## Example source architecture\n\nCopyable examples live in \`apps/playground/src/examples/\` as real \`.tsx\` files. The playground loads those same files with Vite's \`?raw\` support for the code drawer, so rendered playground metadata no longer embeds large duplicate source strings.\n\nMarker gallery composition is split across smaller modules in \`apps/playground/src/playground/examples/\`, while \`PlaygroundExamples.tsx\` keeps \`App.tsx\` shallow. When adding an example, put the consumer-facing React code in \`src/examples\` and reference it with \`exampleSource(...)\`; do not paste a second copy into playground rendering code.\n\n${marker}`,
+    `## Example source architecture\n\nCopyable examples live in \`apps/playground/examples/\` as real \`.tsx\` files outside the playground's TypeScript source tree. The playground loads those same files with Vite's \`?raw\` support for the code drawer, so rendered playground metadata no longer embeds large duplicate source strings.\n\nMarker gallery composition is split across smaller modules in \`apps/playground/src/playground/examples/\`, while \`PlaygroundExamples.tsx\` keeps \`App.tsx\` shallow. When adding an example, put the consumer-facing React code in \`apps/playground/examples\` and reference it with \`exampleSource(...)\`; do not paste a second copy into playground rendering code.\n\n${marker}`,
   );
   writeFileSync(devReadmePath, devReadme);
 }
