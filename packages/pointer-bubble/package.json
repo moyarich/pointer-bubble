@@ -22,7 +22,7 @@
     "./styles.css": "./dist/styles.css"
   },
   "files": ["dist", "README.md"],
-  "sideEffects": ["**/*.css"],
+  "sideEffects": ["**/*.css", "./dist/index.js", "./dist/index.cjs"],
   "peerDependencies": {
     "react": ">=18.2.0"
   },
