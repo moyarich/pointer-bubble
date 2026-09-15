@@ -1,0 +1,35 @@
+name: Refactor playground examples
+
+on:
+  push:
+    branches: [refactor/example-source-files]
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: refactor/example-source-files
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Refactor examples
+        run: node scripts/refactor-playground-examples.mjs
+      - name: Validate refactor
+        run: npm run build:playground
+      - name: Commit generated refactor
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/playground/src docs/README-dev.md
+          git diff --cached --quiet && exit 0
+          git commit -m "Refactor playground examples into source files"
+          git push
