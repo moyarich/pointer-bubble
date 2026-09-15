@@ -54,7 +54,7 @@ test('release entry is independent of playground and styles are explicitly expor
   const bundle = readFileSync(new URL('../packages/pointer-bubble/dist/index.js', import.meta.url), 'utf8');
   assert.doesNotMatch(bundle, /monaco|maplibre|lucide|react-dom|window\.|document\./);
   assert.equal(pkg.exports['./styles.css'], './dist/styles.css');
-  assert.equal(pkg.peerDependencies.react, '^19.0.0');
+  assert.equal(pkg.peerDependencies.react, '^18.2.0 || ^19.0.0');
   const css = readFileSync(new URL('../packages/pointer-bubble/dist/styles.css', import.meta.url), 'utf8');
   assert.match(css, /prefers-reduced-motion/);
   assert.doesNotMatch(css, /:root|(?:^|\n)\s*body\s*\{|@import/);

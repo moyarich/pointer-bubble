@@ -56,7 +56,7 @@ export function MonacoCodePanel({
     overviewRulerBorder: false,
     renderLineHighlight: "none" as const,
     automaticLayout: true,
-    hover: { enabled: "on", above: false, delay: 250, sticky: true },
+    hover: { enabled: true, above: false, delay: 250, sticky: true },
   };
 
   return (
@@ -112,29 +112,16 @@ export function MonacoCodePanel({
           )}
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded-b-xl bg-[#1e1e1e]">
+      <div className="min-h-0 flex-1 overflow-hidden rounded-b-xl">
         <Editor
           height="100%"
           language="typescript"
-          onMount={(editor) => {
-            editorRef.current = editor;
-          }}
-          beforeMount={(monaco) => {
-            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-              jsx: monaco.languages.typescript.JsxEmit.React,
-              jsxFactory: "React.createElement",
-              reactNamespace: "React",
-              allowNonTsExtensions: true,
-              allowJs: true,
-              target: monaco.languages.typescript.ScriptTarget.Latest,
-            });
-            monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions(
-              { noSemanticValidation: true, noSyntaxValidation: false },
-            );
-          }}
           value={code}
-          theme="vs-dark"
           onChange={(value) => onChange?.(value ?? "")}
+          onMount={(mountedEditor) => {
+            editorRef.current = mountedEditor;
+          }}
+          theme="vs-dark"
           options={editorOptions}
         />
       </div>

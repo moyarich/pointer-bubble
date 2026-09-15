@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: github-pages
@@ -23,11 +25,11 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Test library
+        run: npm test
       - name: Configure Pages
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
-      - name: Test library
-        run: npm test
       - name: Build playground for its Pages path
         run: npm run build:playground
         env:
