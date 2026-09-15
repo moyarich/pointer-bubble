@@ -15,7 +15,21 @@ const semanticSelectors = [
   ".better-map-marker .pb-shadow",
 ] as const;
 
-const propertiesBySelector: Record<(typeof semanticSelectors)[number], string[]> = {
+type SemanticSelector = (typeof semanticSelectors)[number];
+
+const targetSelectorByCss: Record<SemanticSelector, string | null> = {
+  ".better-map-marker": null,
+  ".better-map-marker > .pb-pulse": ":scope > .pb-pulse",
+  ".better-map-marker > .pb-body": ":scope > .pb-body",
+  ".better-map-marker .pb-tip": ".pb-tip",
+  ".better-map-marker .pb-tip-outer": ".pb-tip-outer",
+  ".better-map-marker .pb-tip-inner": ".pb-tip-inner",
+  ".better-map-marker .pb-content": ".pb-content",
+  ".better-map-marker > .pb-shadow-wrap": ":scope > .pb-shadow-wrap",
+  ".better-map-marker .pb-shadow": ".pb-shadow",
+};
+
+const propertiesBySelector: Record<SemanticSelector, string[]> = {
   ".better-map-marker": [
     "position",
     "display",
@@ -182,19 +196,19 @@ function escapeHtml(value: string) {
 function formatNode(node: Node, depth = 0): string {
   const indent = "  ".repeat(depth);
 
-  if (node.nodeType === Node.TEXT_NODE) {
+  if (node.nodeType === 3) {
     const text = node.textContent?.trim();
     return text ? `${indent}${text}` : "";
   }
 
-  if (!(node instanceof Element)) return "";
-
-  const tag = node.tagName.toLowerCase();
-  const attributes = Array.from(node.attributes)
+  if (node.nodeType !== 1) return "";
+  const element = node as Element;
+  const tag = element.tagName.toLowerCase();
+  const attributes = Array.from(element.attributes)
     .map((attribute) => `${attribute.name}="${escapeHtml(attribute.value)}"`)
     .join(" ");
   const opening = `${indent}<${tag}${attributes ? ` ${attributes}` : ""}>`;
-  const children = Array.from(node.childNodes)
+  const children = Array.from(element.childNodes)
     .map((child) => formatNode(child, depth + 1))
     .filter(Boolean);
 
@@ -223,10 +237,10 @@ export function createRenderedOutput(root: ParentNode): RenderedOutput | null {
 
   const cssBlocks = semanticSelectors
     .map((selector) => {
-      const element =
-        selector === ".better-map-marker"
-          ? bubble
-          : bubble.querySelector<HTMLElement>(selector.replace(".better-map-marker", "").trim());
+      const targetSelector = targetSelectorByCss[selector];
+      const element = targetSelector
+        ? bubble.querySelector<HTMLElement>(targetSelector)
+        : bubble;
       if (!element) return "";
 
       const style = view.getComputedStyle(element);
