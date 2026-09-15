@@ -176,10 +176,6 @@ Normal development and build commands do not publish anything.
 
 Only the library's intended distribution files, README, and package metadata are included in its npm archive.
 
-## Release Scripts
-
-The repository also provides higher-level release commands.
-
 ### Release check
 
 ```sh
@@ -202,21 +198,13 @@ Publishing requires npm authentication.
 
 ## npm Configuration and `.env`
 
-Local publishing configuration can be stored in the git-ignored `.env` file.
+npm account permissions and authentication required.
 
-New checkouts can copy:
+- CI environments can provide these values directly as environment variables instead.
 
-```sh
-.env.example
-```
+- Local publishing configuration can be stored in the git-ignored `.env` file to keep publishing tokens private.
 
-to:
-
-```sh
-.env
-```
-
-Supported values include:
+Supported environment variables include:
 
 ```env
 NPM_TOKEN=
@@ -237,23 +225,6 @@ next
 public
 ```
 
-CI environments can provide these values directly as environment variables instead.
-
-The publishing flow:
-
-- reads the token from the environment
-- uses a temporary npm configuration
-- does not place the token in command arguments
-- removes the temporary configuration afterward
-- excludes `.env` from Git
-- excludes `.env` from the npm package archive
-
-Keep publishing tokens private.
-
-npm account permissions and authentication requirements still apply.
-
-The package is distributed under the MIT license.
-
 ## GitHub Pages
 
 The included workflow:
@@ -263,10 +234,9 @@ The included workflow:
 ```
 
 builds and deploys **only the playground** to GitHub Pages.
+Vite's base path is needed so that the playground is supported, defaults to "/"
 
-It does not publish the npm package.
-
-The workflow is run manually and configures Vite's base path so the playground can support:
+run the workflow manually on github.com and
 
 ```text
 moyarich.github.io/pointer-bubble/
@@ -297,25 +267,9 @@ The completed deployment provides the playground URL.
 ### Test a project-subpath build locally
 
 ```sh
-PLAYGROUND_BASE_PATH=/pointer-bubble/ npm run build:playground
+PLAYGROUND_BASE_PATH=/ npm run build:playground
 npm run preview
 ```
-
-Then open:
-
-```text
-/pointer-bubble/
-```
-
-in the preview server.
-
-Normal local development continues to use:
-
-```text
-/
-```
-
-The playground is a single-page application without history-based routes, so GitHub Pages does not require a custom SPA rewrite or `404.html`.
 
 ## Task Picker
 
