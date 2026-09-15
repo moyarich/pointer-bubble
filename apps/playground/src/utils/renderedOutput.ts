@@ -1,0 +1,250 @@
+export type RenderedOutput = {
+  html: string;
+  css: string;
+};
+
+const semanticSelectors = [
+  ".better-map-marker",
+  ".better-map-marker > .pb-pulse",
+  ".better-map-marker > .pb-body",
+  ".better-map-marker .pb-tip",
+  ".better-map-marker .pb-tip-outer",
+  ".better-map-marker .pb-tip-inner",
+  ".better-map-marker .pb-content",
+  ".better-map-marker > .pb-shadow-wrap",
+  ".better-map-marker .pb-shadow",
+] as const;
+
+const propertiesBySelector: Record<(typeof semanticSelectors)[number], string[]> = {
+  ".better-map-marker": [
+    "position",
+    "display",
+    "flex-direction",
+    "align-items",
+    "padding-bottom",
+    "min-width",
+    "max-width",
+    "width",
+    "min-height",
+    "max-height",
+    "height",
+  ],
+  ".better-map-marker > .pb-pulse": [
+    "position",
+    "left",
+    "top",
+    "z-index",
+    "translate",
+    "transform",
+    "border-radius",
+    "background-color",
+    "width",
+    "height",
+    "opacity",
+    "animation",
+  ],
+  ".better-map-marker > .pb-body": [
+    "position",
+    "display",
+    "place-items",
+    "min-width",
+    "max-width",
+    "width",
+    "min-height",
+    "max-height",
+    "height",
+    "padding",
+    "border-width",
+    "border-style",
+    "border-color",
+    "border-radius",
+    "background-color",
+    "color",
+    "font-size",
+    "font-weight",
+    "line-height",
+    "box-shadow",
+    "translate",
+    "scale",
+    "transform",
+    "transition",
+  ],
+  ".better-map-marker .pb-tip": ["position", "bottom"],
+  ".better-map-marker .pb-tip-outer": [
+    "position",
+    "left",
+    "top",
+    "z-index",
+    "translate",
+    "margin-top",
+    "border-left-width",
+    "border-left-style",
+    "border-left-color",
+    "border-right-width",
+    "border-right-style",
+    "border-right-color",
+    "border-top-width",
+    "border-top-style",
+    "border-top-color",
+  ],
+  ".better-map-marker .pb-tip-inner": [
+    "position",
+    "left",
+    "top",
+    "z-index",
+    "translate",
+    "margin-top",
+    "border-left-width",
+    "border-left-style",
+    "border-left-color",
+    "border-right-width",
+    "border-right-style",
+    "border-right-color",
+    "border-top-width",
+    "border-top-style",
+    "border-top-color",
+  ],
+  ".better-map-marker .pb-content": [
+    "position",
+    "z-index",
+    "display",
+    "place-items",
+    "min-width",
+    "max-width",
+    "width",
+    "min-height",
+    "max-height",
+    "height",
+    "padding",
+    "border-width",
+    "border-style",
+    "border-color",
+    "border-radius",
+    "background-color",
+    "color",
+    "font-size",
+    "font-weight",
+    "line-height",
+    "text-align",
+    "white-space",
+    "overflow-wrap",
+    "filter",
+    "backdrop-filter",
+  ],
+  ".better-map-marker > .pb-shadow-wrap": [
+    "position",
+    "width",
+    "height",
+  ],
+  ".better-map-marker .pb-shadow": [
+    "position",
+    "left",
+    "translate",
+    "margin-top",
+    "width",
+    "height",
+    "border-radius",
+    "background-color",
+    "filter",
+  ],
+};
+
+const pointerBubbleVariables = [
+  "--marker-bg",
+  "--marker-border",
+  "--marker-text",
+  "--marker-ring",
+  "--marker-pulse",
+  "--marker-shadow",
+  "--marker-content-bg",
+  "--marker-content-border",
+  "--pb-bubble",
+  "--pb-border",
+  "--pb-px",
+  "--pb-py",
+  "--pb-font",
+  "--pb-content",
+  "--pb-content-px",
+  "--pb-shadow-mt",
+  "--pb-shadow-h",
+  "--pb-shadow-w",
+  "--pb-pulse",
+] as const;
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function formatNode(node: Node, depth = 0): string {
+  const indent = "  ".repeat(depth);
+
+  if (node.nodeType === Node.TEXT_NODE) {
+    const text = node.textContent?.trim();
+    return text ? `${indent}${text}` : "";
+  }
+
+  if (!(node instanceof Element)) return "";
+
+  const tag = node.tagName.toLowerCase();
+  const attributes = Array.from(node.attributes)
+    .map((attribute) => `${attribute.name}="${escapeHtml(attribute.value)}"`)
+    .join(" ");
+  const opening = `${indent}<${tag}${attributes ? ` ${attributes}` : ""}>`;
+  const children = Array.from(node.childNodes)
+    .map((child) => formatNode(child, depth + 1))
+    .filter(Boolean);
+
+  if (children.length === 0) return `${opening}</${tag}>`;
+
+  return `${opening}\n${children.join("\n")}\n${indent}</${tag}>`;
+}
+
+function cssBlock(selector: string, declarations: string[]) {
+  if (declarations.length === 0) return "";
+  return `${selector} {\n${declarations.map((line) => `  ${line}`).join("\n")}\n}`;
+}
+
+export function createRenderedOutput(root: ParentNode): RenderedOutput | null {
+  const bubble = root.querySelector<HTMLElement>(".better-map-marker");
+  if (!bubble) return null;
+
+  const view = bubble.ownerDocument.defaultView;
+  if (!view) return null;
+
+  const rootStyle = view.getComputedStyle(bubble);
+  const variableDeclarations = pointerBubbleVariables
+    .map((property) => [property, rootStyle.getPropertyValue(property).trim()] as const)
+    .filter(([, value]) => value)
+    .map(([property, value]) => `${property}: ${value};`);
+
+  const cssBlocks = semanticSelectors
+    .map((selector) => {
+      const element =
+        selector === ".better-map-marker"
+          ? bubble
+          : bubble.querySelector<HTMLElement>(selector.replace(".better-map-marker", "").trim());
+      if (!element) return "";
+
+      const style = view.getComputedStyle(element);
+      const declarations = propertiesBySelector[selector]
+        .map((property) => [property, style.getPropertyValue(property).trim()] as const)
+        .filter(([, value]) => value)
+        .map(([property, value]) => `${property}: ${value};`);
+
+      if (selector === ".better-map-marker") {
+        declarations.unshift(...variableDeclarations);
+      }
+
+      return cssBlock(selector, declarations);
+    })
+    .filter(Boolean);
+
+  return {
+    html: formatNode(bubble),
+    css: cssBlocks.join("\n\n"),
+  };
+}
