@@ -288,29 +288,6 @@ import {
 } from "@moyarich/pointer-bubble";
 ```
 
-## Generate README Screenshots
-
-Start the playground:
-
-```sh
-npm run dev:playground
-```
-
-Then, in another terminal:
-
-```sh
-npx playwright install chromium
-npm run demo:readme
-```
-
-The Playwright demo writes:
-
-```text
-docs/screenshots/playground-overview.png
-docs/screenshots/maplibre-example.png
-```
-
-The demo source lives at [`scripts/demos/readme.mjs`](scripts/demos/readme.mjs).
 
 ## Public Exports
 
