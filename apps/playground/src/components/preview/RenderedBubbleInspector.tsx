@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { MonacoCodePanel } from "../editor/MonacoCodePanel";
-import { createRenderedOutput, type RenderedOutput } from "@/utils/renderedOutput";
+import {
+  createRenderedOutput,
+  type RenderedOutput,
+} from "@/utils/renderedOutput";
 
 const drawerSelector = 'aside[role="dialog"]';
 const inspectorAttribute = "data-rendered-output-inspector";
@@ -34,7 +37,7 @@ function findPreviewRoot(host: HTMLElement) {
 }
 
 function readRenderedOutput(host: HTMLElement): RenderedOutput | null {
-  const directBubble = host.querySelector<HTMLElement>(".better-map-marker");
+  const directBubble = host.querySelector<HTMLElement>(".pointer-bubble");
   if (directBubble) {
     return createRenderedOutput(directBubble.parentElement ?? host);
   }
@@ -227,7 +230,9 @@ export function RenderedBubbleInspector() {
               code={code}
               readOnly
               language={tab}
-              filename={tab === "html" ? "pointer-bubble.html" : "pointer-bubble.css"}
+              filename={
+                tab === "html" ? "pointer-bubble.html" : "pointer-bubble.css"
+              }
               onCopy={copyCode}
               copied={copied}
             />

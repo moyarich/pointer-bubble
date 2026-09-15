@@ -78,16 +78,13 @@ export function PointerBubble({
   return (
     <div
       {...rootProps}
-      className={cn("better-map-marker", rootClass)}
+      className={cn("pointer-bubble", rootClass)}
       data-size={size}
       data-selected={selected || undefined}
       style={{ ...markerStyle, ...style }}
     >
       {selected && showPulse && (
-        <span
-          aria-hidden="true"
-          className={cn("pb-pulse", pulseClass)}
-        />
+        <span aria-hidden="true" className={cn("pb-pulse", pulseClass)} />
       )}
 
       <div className={cn("pb-body", className)}>
