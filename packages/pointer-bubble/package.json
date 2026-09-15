@@ -41,7 +41,8 @@
     "build": "vite build --config vite.config.ts && tsc -p tsconfig.build.json && node scripts/write-cjs-types.mjs",
     "typecheck": "tsc -p tsconfig.json",
     "test": "npm run build && node --test tests/*.test.mjs",
-    "prepack": "npm run build"
+    "prepack": "node ../../scripts/sync-package-readme.mjs && npm run build",
+    "postpack": "node ../../scripts/sync-package-readme.mjs --clean"
   },
   "repository": {
     "type": "git",
