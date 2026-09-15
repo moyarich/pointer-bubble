@@ -1,210 +1,156 @@
 # PointerBubble — Developer Guide
 
-Developer documentation for the `PointerBubble` component library and its local playground.
+Developer documentation for the `@moyarich/pointer-bubble` React library and its playground.
 
-The repository contains both:
+## Workspace layout
 
-- the distributable `@moyarich/pointer-bubble` React package
-- a playground for exploring markers, speech bubbles, sizes, colors, custom shapes, and package behavior
+```text
+pointer-bubble/
+├── apps/
+│   └── playground/                 # private Vite application
+│       ├── package.json
+│       ├── src/
+│       ├── index.html
+│       ├── components.json
+│       ├── tsconfig.json
+│       └── vite.config.ts
+├── packages/
+│   └── pointer-bubble/             # publishable React library
+│       ├── package.json
+│       ├── src/
+│       ├── tests/
+│       ├── tsconfig.json
+│       ├── tsconfig.build.json
+│       └── vite.config.ts
+├── scripts/                         # repository/release helpers
+├── .github/workflows/               # CI and playground deployment
+├── package.json                     # workspace orchestration only
+├── package-lock.json
+└── tsconfig.base.json               # shared TypeScript defaults
+```
+
+`packages/*` contains distributable packages. `apps/*` contains applications that consume those packages. The playground is deliberately private and is never part of the npm package.
 
 ## Requirements
-
-Use:
 
 - Node.js 22.12+
 - npm
 
-## Development
-
-Install dependencies and start the playground:
+Install all workspace dependencies from the repository root:
 
 ```sh
 npm install
-npm run dev
 ```
 
-The playground imports the local library using its npm package name:
-
-```text
-@moyarich/pointer-bubble
-```
-
-This keeps local development aligned with how consumers import the published package.
-
-## Project Structure
-
-```text
-packages/pointer-bubble/
-  Distributable component library, public types, styles, and package metadata
-
-src/App.tsx
-  Playground composition
-
-src/playground/examples/
-  Marker galleries and map examples
-
-src/playground/drawer/
-  Shared drawer UI, docking, resizing, and editing state
-
-src/playground/editor/
-  Lazily loaded Monaco editor
-
-src/playground/preview/
-  TSX compilation and iframe rendering using the host React runtime
-
-tests/
-  Built-package rendering and package-boundary checks
-```
-
-The library remains isolated from playground-only dependencies.
-
-It does not import:
-
-- Monaco
-- MapLibre
-- Lucide
-- playground code
-- application-wide styles
-
-React is a peer dependency.
-
-Existing class-based overrides remain supported, so consumers can customize the component with plain CSS, Tailwind utilities, or their own styling system.
-
-## Validation
-
-Run the full validation sequence before preparing a release:
+## Work on the library
 
 ```sh
-npm run typecheck
-npm test
-npm run build
-npm run pack:lib
+npm run typecheck --workspace @moyarich/pointer-bubble
+npm test --workspace @moyarich/pointer-bubble
+npm run build --workspace @moyarich/pointer-bubble
 ```
 
-### Build output
+Library source lives in:
 
-`npm run build` produces:
+```text
+packages/pointer-bubble/src/
+```
+
+Its build output is:
 
 ```text
 packages/pointer-bubble/dist/
 ```
 
-for the library, and:
+The library build includes ESM, CommonJS, TypeScript declarations, and `styles.css`.
 
-```text
-dist/
-```
+The library must remain independent of playground-only dependencies such as Monaco, MapLibre, Lucide, shadcn, and application-wide styles. React remains a peer dependency.
 
-for the playground.
+## Work on the playground
 
-The library build includes:
-
-- ESM
-- CommonJS
-- TypeScript declarations
-- `styles.css`
-
-### Package inspection
+From the repository root:
 
 ```sh
-npm run pack:lib
+npm run dev
 ```
 
-builds the library and previews the contents of the npm archive without publishing it.
+or explicitly:
 
-Use this to confirm that only the intended package files are included.
+```sh
+npm run dev:playground
+```
 
-## Playground Notes
+You can also work from the app package itself:
 
-The playground's editable TSX preview depends on external services.
+```sh
+cd apps/playground
+npm run dev
+```
 
-Internet access is required for:
+The playground imports the local library using its public npm package name:
 
-- esbuild
-- Tailwind
-- Monaco
-- map tiles
+```text
+@moyarich/pointer-bubble
+```
 
-The playground executes user-entered code and is intended for trusted local examples.
+Vite and TypeScript resolve that package to the workspace library source during local development, so playground changes exercise the same public API consumers use.
 
-It should not be treated as a sandbox for running untrusted shared code.
+Playground build output is:
 
-## Prepare a Release
+```text
+apps/playground/dist/
+```
 
-Before publishing a new package version:
+## Repository commands
 
-1. Update the version in the library package.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the playground |
+| `npm run dev:playground` | Start the playground explicitly |
+| `npm run typecheck` | Typecheck all workspaces that expose a typecheck script |
+| `npm test` | Build and test the library |
+| `npm run build:lib` | Build only the library |
+| `npm run build:playground` | Build only the playground |
+| `npm run build` | Build the library and playground |
+| `npm run preview` | Preview the playground production build |
+| `npm run pack:lib` | Preview the npm package archive |
+| `npm run release:check` | Validate a release without publishing |
+| `npm run publish:lib` | Validate and publish the library |
+| `npm run tasks` | Open the interactive task picker |
 
-2. Update the matching playground workspace dependency if necessary.
+## Package tests
 
-3. Refresh the lockfile:
+Package-boundary tests live with the library:
 
-   ```sh
-   npm install
-   ```
+```text
+packages/pointer-bubble/tests/
+```
 
-4. Run the validation commands:
+They render the built ESM and CommonJS entries, verify exported styles, validate peer dependency metadata, and ensure playground dependencies do not leak into the release bundle.
 
-   ```sh
-   npm run typecheck
-   npm test
-   npm run build
-   npm run pack:lib
-   ```
+## Release validation
 
-5. Create the release candidate tarball:
-
-   ```sh
-   npm pack --workspace @moyarich/pointer-bubble
-   ```
-
-6. Install the generated `.tgz` file into a separate React 19 application:
-
-   ```sh
-   npm install /path/to/moyarich-pointer-bubble-0.1.0.tgz
-   ```
-
-   Verify imports, styles, rendering, and TypeScript declarations against the packaged artifact rather than the workspace source.
-
-7. Publish the package:
-
-   ```sh
-   npm publish --workspace @moyarich/pointer-bubble --access public
-   ```
-
-Normal development and build commands do not publish anything.
-
-Only the library's intended distribution files, README, and package metadata are included in its npm archive.
-
-### Release check
+Before publishing:
 
 ```sh
 npm run release:check
 ```
 
-Runs the release validation flow, including type checking, tests, builds, and archive inspection.
+This typechecks the workspaces, builds/tests the library, and performs a dry-run npm archive check.
 
-It does **not** publish the package.
+To inspect the package directly:
 
-### Publish library
+```sh
+npm run pack:lib
+```
+
+To publish after updating the package version:
 
 ```sh
 npm run publish:lib
 ```
 
-Runs the release checks and then publishes the library to npm.
-
-Publishing requires npm authentication.
-
-## npm Configuration and `.env`
-
-npm account permissions and authentication required.
-
-- CI environments can provide these values directly as environment variables instead.
-
-- Local publishing configuration can be stored in the git-ignored `.env` file to keep publishing tokens private.
-
-Supported environment variables include:
+Publishing requires `NPM_TOKEN`. Local release configuration can be kept in the git-ignored `.env` file:
 
 ```env
 NPM_TOKEN=
@@ -212,105 +158,37 @@ NPM_TAG=latest
 NPM_ACCESS=public
 ```
 
-`NPM_TAG` can be set to values such as:
+## Playground notes
 
-```text
-latest
-next
-```
-
-`NPM_ACCESS` defaults to:
-
-```text
-public
-```
+The editable TSX preview depends on external services for Monaco, map tiles, and browser-side compilation/styling resources. It is intended for trusted examples, not as a security sandbox for untrusted code.
 
 ## GitHub Pages
 
-The included workflow:
+`.github/workflows/playground-pages.yml` builds only `apps/playground` and uploads:
 
 ```text
-.github/workflows/playground-pages.yml
+apps/playground/dist/
 ```
 
-builds and deploys **only the playground** to GitHub Pages.
-Vite's base path is needed so that the playground is supported, defaults to "/"
+The Vite base path is supplied by the workflow so project Pages URLs such as `moyarich.github.io/pointer-bubble/` work correctly.
 
-run the workflow manually on github.com and
+Enable Pages once under **Settings → Pages → Build and deployment → GitHub Actions**, then run **Deploy PointerBubble playground**.
 
-```text
-moyarich.github.io/pointer-bubble/
-```
-
-as well as root sites and custom domains.
-
-### Enable GitHub Pages
-
-1. Push the project to its GitHub repository.
-
-2. Open:
-
-   **Settings → Pages → Build and deployment**
-
-3. Select:
-
-   **GitHub Actions**
-
-4. Use `main` as the release branch, or update the workflow if the repository uses a different default branch.
-
-5. Open GitHub Actions and run:
-
-   **Deploy PointerBubble playground**
-
-The completed deployment provides the playground URL.
-
-### Test a project-subpath build locally
+To test a project-subpath-style build locally:
 
 ```sh
 PLAYGROUND_BASE_PATH=/ npm run build:playground
 npm run preview
 ```
 
-## Task Picker
-
-Run:
+## Task picker
 
 ```sh
 npm run tasks
 ```
 
-to open the repository task picker.
-
-Available tasks include development, builds, previews, tests, release validation, and live npm publishing.
-
-The picker uses `fzf` when available.
-
-Press `Esc` to cancel.
-
-If `fzf` is not installed, the script falls back to a numbered terminal menu.
-
-The helper requires Bash, but the underlying npm scripts can still be run directly without Bash or `fzf`.
-
-### List tasks without running one
+The picker uses `fzf` when available and falls back to a numbered terminal menu. To list tasks non-interactively:
 
 ```sh
 npm run tasks -- --list
 ```
-
-This prints the available commands without opening the interactive picker.
-
-## Common Commands
-
-| Command                    | Purpose                                   |
-| -------------------------- | ----------------------------------------- |
-| `npm run dev`              | Start the local playground                |
-| `npm run typecheck`        | Run TypeScript validation                 |
-| `npm test`                 | Run the test suite                        |
-| `npm run build`            | Build the library and playground          |
-| `npm run build:playground` | Build the playground                      |
-| `npm run preview`          | Preview the playground build              |
-| `npm run pack:lib`         | Build and inspect the npm package archive |
-| `npm run release:check`    | Run release validation without publishing |
-| `npm run publish:lib`      | Validate and publish the library          |
-| `npm run tasks`            | Open the interactive task picker          |
-| `npm run tasks -- --list`  | Print available task-picker commands      |
