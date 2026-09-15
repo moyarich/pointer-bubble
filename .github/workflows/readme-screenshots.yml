@@ -28,7 +28,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Start playground
         run: |
-          npm run dev:playground -- --host 127.0.0.1 > /tmp/pointer-bubble-vite.log 2>&1 &
+          npm run dev --workspace @moyarich/pointer-bubble-playground -- --host 127.0.0.1 > /tmp/pointer-bubble-vite.log 2>&1 &
           for i in {1..30}; do
             if curl --fail --silent http://127.0.0.1:5173 >/dev/null; then exit 0; fi
             sleep 1
