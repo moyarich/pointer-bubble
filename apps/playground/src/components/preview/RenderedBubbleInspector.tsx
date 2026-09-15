@@ -192,10 +192,16 @@ export function RenderedBubbleInspector() {
 
   if (!host) return null;
 
+  const showingCode = tab !== "preview";
+
   return createPortal(
     <div
       data-rendered-output-inspector=""
-      className="order-first flex min-h-0 flex-1 flex-col"
+      className={
+        showingCode
+          ? "order-first flex min-h-0 flex-1 flex-col"
+          : "order-first shrink-0"
+      }
     >
       <div className="mb-3 grid grid-cols-3 rounded-xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
         {(["preview", "html", "css"] as const).map((value) => (
@@ -214,7 +220,7 @@ export function RenderedBubbleInspector() {
         ))}
       </div>
 
-      {tab !== "preview" && (
+      {showingCode && (
         <div className="min-h-0 flex-1">
           {output ? (
             <MonacoCodePanel
