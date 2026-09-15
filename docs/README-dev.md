@@ -292,3 +292,29 @@ The picker uses `fzf` when available and falls back to a numbered terminal menu.
 ```sh
 npm run tasks -- --list
 ```
+
+
+## Generate README Screenshots
+
+Start the playground:
+
+```sh
+npm run dev:playground
+```
+
+Then, in another terminal:
+
+```sh
+npx playwright install chromium
+npm run demo:readme
+```
+
+The Playwright demo writes:
+
+```text
+docs/screenshots/playground-overview.png
+docs/screenshots/maplibre-example.png
+```
+
+The demo source lives at [`scripts/demos/readme.mjs`](scripts/demos/readme.mjs).
+
