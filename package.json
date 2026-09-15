@@ -1,51 +1,24 @@
 {
-  "name": "pointer-bubble-playground",
-  "version": "1.0.0",
+  "name": "pointer-bubble-workspace",
   "private": true,
-  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run dev --workspace @moyarich/pointer-bubble-playground",
+    "dev:playground": "npm run dev --workspace @moyarich/pointer-bubble-playground",
+    "preview": "npm run preview --workspace @moyarich/pointer-bubble-playground",
     "build": "npm run build:lib && npm run build:playground",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "build:playground": "tsc --noEmit && vite build",
     "build:lib": "npm run build --workspace @moyarich/pointer-bubble",
-    "test": "npm run build:lib && node --test tests/*.test.mjs",
+    "build:playground": "npm run build --workspace @moyarich/pointer-bubble-playground",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspace @moyarich/pointer-bubble",
     "pack:lib": "npm pack --workspace @moyarich/pointer-bubble --dry-run",
     "release:check": "node scripts/publish.mjs --dry-run",
     "publish:lib": "node scripts/publish.mjs --publish",
     "tasks": "bash scripts/tasks.sh"
   },
-  "dependencies": {
-    "@base-ui/react": "^1.7.0",
-    "@fontsource-variable/inter": "^5.3.0",
-    "@monaco-editor/react": "^4.7.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.33.0",
-    "maplibre-gl": "^6.5.0",
-    "marked": "^18.0.10",
-    "mermaid": "^11.17.0",
-    "react-dom": "^19.2.8",
-    "shadcn": "^4.19.0",
-    "tailwind-merge": "^3.6.0",
-    "tw-animate-css": "^1.4.0",
-    "react": "^19.2.8",
-    "@moyarich/pointer-bubble": "0.1.0"
-  },
-  "devDependencies": {
-    "@types/node": "^26.2.0",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.5",
-    "typescript": "^7.0.2",
-    "vite": "^8.2.2",
-    "@tailwindcss/vite": "^4.3.3",
-    "@vitejs/plugin-react": "^6.1.0",
-    "tailwindcss": "^4.3.3"
-  },
-  "workspaces": [
-    "packages/*"
-  ],
   "engines": {
     "node": ">=22.12.0"
   },

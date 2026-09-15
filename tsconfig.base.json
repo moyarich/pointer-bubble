@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -19,20 +15,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "noUncheckedSideEffectImports": true,
-    "types": [
-      "node"
-    ],
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@moyarich/pointer-bubble": [
-        "./packages/pointer-bubble/src/index.ts"
-      ]
-    }
-  },
-  "include": [
-    "src"
-  ]
+    "noUncheckedSideEffectImports": true
+  }
 }

@@ -10,10 +10,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@moyarich/pointer-bubble/styles.css": fileURLToPath(
-        new URL("./packages/pointer-bubble/src/styles.css", import.meta.url),
+        new URL("../../packages/pointer-bubble/src/styles.css", import.meta.url),
       ),
       "@moyarich/pointer-bubble": fileURLToPath(
-        new URL("./packages/pointer-bubble/src/index.ts", import.meta.url),
+        new URL("../../packages/pointer-bubble/src/index.ts", import.meta.url),
       ),
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
