@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { MonacoCodePanel } from "../editor/MonacoCodePanel";
 import { createRenderedOutput, type RenderedOutput } from "@/utils/renderedOutput";
-import { RenderedOutputPanel } from "./RenderedOutputPanel";
 
 const drawerSelector = 'aside[role="dialog"]';
 const inspectorAttribute = "data-rendered-output-inspector";
+type OutputTab = "preview" | "html" | "css";
 
 function findDrawerOutputHost() {
   const drawer = document.querySelector<HTMLElement>(drawerSelector);
@@ -18,13 +19,18 @@ function findDrawerOutputHost() {
   return livePreviewLabel?.parentElement?.parentElement ?? null;
 }
 
-function findPreviewRoot(host: HTMLElement) {
-  return Array.from(host.children).find(
-    (element) =>
+function findPreviewChildren(host: HTMLElement) {
+  return Array.from(host.children).filter(
+    (element): element is HTMLElement =>
       element instanceof HTMLElement &&
-      !element.hasAttribute(inspectorAttribute) &&
-      !element.querySelector("span")?.textContent?.includes("Live Preview"),
-  ) as HTMLElement | undefined;
+      !element.hasAttribute(inspectorAttribute),
+  );
+}
+
+function findPreviewRoot(host: HTMLElement) {
+  return findPreviewChildren(host).find(
+    (element) => !element.textContent?.includes("Live Preview"),
+  );
 }
 
 function readRenderedOutput(host: HTMLElement): RenderedOutput | null {
@@ -38,9 +44,21 @@ function readRenderedOutput(host: HTMLElement): RenderedOutput | null {
   return iframeDocument ? createRenderedOutput(iframeDocument) : null;
 }
 
+function setPreviewVisibility(host: HTMLElement, visible: boolean) {
+  for (const child of findPreviewChildren(host)) child.hidden = !visible;
+}
+
 export function RenderedBubbleInspector() {
   const [host, setHost] = useState<HTMLElement | null>(null);
   const [output, setOutput] = useState<RenderedOutput | null>(null);
+  const [tab, setTab] = useState<OutputTab>("preview");
+  const [copied, setCopied] = useState(false);
+
+  const code = useMemo(() => {
+    if (tab === "html") return output?.html ?? "";
+    if (tab === "css") return output?.css ?? "";
+    return "";
+  }, [output, tab]);
 
   useEffect(() => {
     let previewObserver: MutationObserver | null = null;
@@ -141,11 +159,79 @@ export function RenderedBubbleInspector() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!host) return;
+
+    const originalDisplay = host.style.display;
+    const originalFlexDirection = host.style.flexDirection;
+    const originalOverflow = host.style.overflow;
+
+    host.style.display = "flex";
+    host.style.flexDirection = "column";
+    host.style.overflow = "hidden";
+    setPreviewVisibility(host, tab === "preview");
+
+    return () => {
+      setPreviewVisibility(host, true);
+      host.style.display = originalDisplay;
+      host.style.flexDirection = originalFlexDirection;
+      host.style.overflow = originalOverflow;
+    };
+  }, [host, tab]);
+
+  async function copyCode() {
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1200);
+    } catch {
+      setCopied(false);
+    }
+  }
+
   if (!host) return null;
 
   return createPortal(
-    <div data-rendered-output-inspector="" className="mt-3 min-h-[16rem]">
-      <RenderedOutputPanel output={output} />
+    <div
+      data-rendered-output-inspector=""
+      className="order-first flex min-h-0 flex-1 flex-col"
+    >
+      <div className="mb-3 grid grid-cols-3 rounded-xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
+        {(["preview", "html", "css"] as const).map((value) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setTab(value)}
+            className={`rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide transition ${
+              tab === value
+                ? "bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200"
+                : "text-slate-500 hover:bg-white/70 hover:text-slate-900"
+            }`}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
+
+      {tab !== "preview" && (
+        <div className="min-h-0 flex-1">
+          {output ? (
+            <MonacoCodePanel
+              code={code}
+              readOnly
+              language={tab}
+              filename={tab === "html" ? "pointer-bubble.html" : "pointer-bubble.css"}
+              onCopy={copyCode}
+              copied={copied}
+            />
+          ) : (
+            <div className="flex h-full min-h-[220px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-950 px-6 text-center text-xs text-slate-400">
+              Run the preview to inspect the rendered PointerBubble output.
+            </div>
+          )}
+        </div>
+      )}
     </div>,
     host,
   );
