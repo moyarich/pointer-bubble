@@ -16,7 +16,7 @@
     "test": "npm run test --workspace @moyarich/pointer-bubble",
     "pack:lib": "npm pack --workspace @moyarich/pointer-bubble --dry-run",
     "release:check": "node scripts/publish.mjs --dry-run",
-    "publish:lib": "node scripts/publish.mjs --publish",
+    "stage:lib": "node scripts/publish.mjs --stage",
     "demo:readme": "node scripts/demos/readme.mjs",
     "screenshots:readme": "npm run demo:readme",
     "tasks": "bash scripts/tasks.sh"
