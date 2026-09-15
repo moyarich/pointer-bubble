@@ -1,15 +1,54 @@
 import { clsx } from "clsx";
-import React, { useEffect, useRef, useState, useMemo, useImperativeHandle, useReducer, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
-import { Code2, X, Grip, GripVertical, PanelRight, PanelBottom, Move, PanelRightClose, PanelRightOpen } from "lucide-react";
-import { PointerBubble, type PointerBubbleProps } from "@moyarich/pointer-bubble";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useImperativeHandle,
+  useReducer,
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+} from "react";
+import {
+  Code2,
+  X,
+  Grip,
+  GripVertical,
+  PanelRight,
+  PanelBottom,
+  Move,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react";
+import {
+  PointerBubble,
+  type PointerBubbleProps,
+} from "@moyarich/pointer-bubble";
 import { cn } from "@/lib/utils";
-const LazyPreview = React.lazy(() => import("../preview/EsbuildIframePreview").then(module => ({ default: module.EsbuildIframePreview })));
+const LazyPreview = React.lazy(() =>
+  import("../preview/EsbuildIframePreview").then((module) => ({
+    default: module.EsbuildIframePreview,
+  })),
+);
 function EsbuildIframePreview(props: React.ComponentProps<typeof LazyPreview>) {
-  return <React.Suspense fallback={<p role="status">Loading preview…</p>}><LazyPreview {...props} /></React.Suspense>;
+  return (
+    <React.Suspense fallback={<p role="status">Loading preview…</p>}>
+      <LazyPreview {...props} />
+    </React.Suspense>
+  );
 }
-const LazyEditor = React.lazy(() => import("../editor/MonacoCodePanel").then(module => ({ default: module.MonacoCodePanel })));
+const LazyEditor = React.lazy(() =>
+  import("../editor/MonacoCodePanel").then((module) => ({
+    default: module.MonacoCodePanel,
+  })),
+);
 function MonacoCodePanel(props: React.ComponentProps<typeof LazyEditor>) {
-  return <React.Suspense fallback={<p role="status">Loading editor…</p>}><LazyEditor {...props} /></React.Suspense>;
+  return (
+    <React.Suspense fallback={<p role="status">Loading editor…</p>}>
+      <LazyEditor {...props} />
+    </React.Suspense>
+  );
 }
 const playgroundDrawerEventName = "pointer-bubble:open-playground-drawer";
 const playgroundDrawerActiveCardEventName =
@@ -187,7 +226,7 @@ function CodeButton({
       role="button"
       tabIndex={0}
       className={cn(
-        "group relative block w-full cursor-pointer rounded-[1.1rem] text-left transition",
+        "playground-drawer group relative block w-full cursor-pointer rounded-[1.1rem] text-left transition",
         isActive &&
           "ring-2 ring-indigo-500 ring-offset-2 ring-offset-slate-100",
       )}

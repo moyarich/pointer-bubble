@@ -4,33 +4,33 @@ export type RenderedOutput = {
 };
 
 const semanticSelectors = [
-  ".better-map-marker",
-  ".better-map-marker > .pb-pulse",
-  ".better-map-marker > .pb-body",
-  ".better-map-marker .pb-tip",
-  ".better-map-marker .pb-tip-outer",
-  ".better-map-marker .pb-tip-inner",
-  ".better-map-marker .pb-content",
-  ".better-map-marker > .pb-shadow-wrap",
-  ".better-map-marker .pb-shadow",
+  ".pointer-bubble",
+  ".pointer-bubble > .pb-pulse",
+  ".pointer-bubble > .pb-body",
+  ".pointer-bubble .pb-tip",
+  ".pointer-bubble .pb-tip-outer",
+  ".pointer-bubble .pb-tip-inner",
+  ".pointer-bubble .pb-content",
+  ".pointer-bubble > .pb-shadow-wrap",
+  ".pointer-bubble .pb-shadow",
 ] as const;
 
 type SemanticSelector = (typeof semanticSelectors)[number];
 
 const targetSelectorByCss: Record<SemanticSelector, string | null> = {
-  ".better-map-marker": null,
-  ".better-map-marker > .pb-pulse": ":scope > .pb-pulse",
-  ".better-map-marker > .pb-body": ":scope > .pb-body",
-  ".better-map-marker .pb-tip": ".pb-tip",
-  ".better-map-marker .pb-tip-outer": ".pb-tip-outer",
-  ".better-map-marker .pb-tip-inner": ".pb-tip-inner",
-  ".better-map-marker .pb-content": ".pb-content",
-  ".better-map-marker > .pb-shadow-wrap": ":scope > .pb-shadow-wrap",
-  ".better-map-marker .pb-shadow": ".pb-shadow",
+  ".pointer-bubble": null,
+  ".pointer-bubble > .pb-pulse": ":scope > .pb-pulse",
+  ".pointer-bubble > .pb-body": ":scope > .pb-body",
+  ".pointer-bubble .pb-tip": ".pb-tip",
+  ".pointer-bubble .pb-tip-outer": ".pb-tip-outer",
+  ".pointer-bubble .pb-tip-inner": ".pb-tip-inner",
+  ".pointer-bubble .pb-content": ".pb-content",
+  ".pointer-bubble > .pb-shadow-wrap": ":scope > .pb-shadow-wrap",
+  ".pointer-bubble .pb-shadow": ".pb-shadow",
 };
 
 const propertiesBySelector: Record<SemanticSelector, string[]> = {
-  ".better-map-marker": [
+  ".pointer-bubble": [
     "position",
     "display",
     "flex-direction",
@@ -43,7 +43,7 @@ const propertiesBySelector: Record<SemanticSelector, string[]> = {
     "max-height",
     "height",
   ],
-  ".better-map-marker > .pb-pulse": [
+  ".pointer-bubble > .pb-pulse": [
     "position",
     "left",
     "top",
@@ -57,7 +57,7 @@ const propertiesBySelector: Record<SemanticSelector, string[]> = {
     "opacity",
     "animation",
   ],
-  ".better-map-marker > .pb-body": [
+  ".pointer-bubble > .pb-body": [
     "position",
     "display",
     "place-items",
@@ -83,8 +83,8 @@ const propertiesBySelector: Record<SemanticSelector, string[]> = {
     "transform",
     "transition",
   ],
-  ".better-map-marker .pb-tip": ["position", "bottom"],
-  ".better-map-marker .pb-tip-outer": [
+  ".pointer-bubble .pb-tip": ["position", "bottom"],
+  ".pointer-bubble .pb-tip-outer": [
     "position",
     "left",
     "top",
@@ -101,7 +101,7 @@ const propertiesBySelector: Record<SemanticSelector, string[]> = {
     "border-top-style",
     "border-top-color",
   ],
-  ".better-map-marker .pb-tip-inner": [
+  ".pointer-bubble .pb-tip-inner": [
     "position",
     "left",
     "top",
@@ -118,7 +118,7 @@ const propertiesBySelector: Record<SemanticSelector, string[]> = {
     "border-top-style",
     "border-top-color",
   ],
-  ".better-map-marker .pb-content": [
+  ".pointer-bubble .pb-content": [
     "position",
     "z-index",
     "display",
@@ -145,12 +145,8 @@ const propertiesBySelector: Record<SemanticSelector, string[]> = {
     "filter",
     "backdrop-filter",
   ],
-  ".better-map-marker > .pb-shadow-wrap": [
-    "position",
-    "width",
-    "height",
-  ],
-  ".better-map-marker .pb-shadow": [
+  ".pointer-bubble > .pb-shadow-wrap": ["position", "width", "height"],
+  ".pointer-bubble .pb-shadow": [
     "position",
     "left",
     "translate",
@@ -225,9 +221,9 @@ function cssBlock(selector: string, declarations: string[]) {
 function resolveBubble(root: ParentNode) {
   if (root.nodeType === 1) {
     const element = root as HTMLElement;
-    if (element.matches(".better-map-marker")) return element;
+    if (element.matches(".pointer-bubble")) return element;
   }
-  return root.querySelector<HTMLElement>(".better-map-marker");
+  return root.querySelector<HTMLElement>(".pointer-bubble");
 }
 
 export function createRenderedOutput(root: ParentNode): RenderedOutput | null {
@@ -239,7 +235,10 @@ export function createRenderedOutput(root: ParentNode): RenderedOutput | null {
 
   const rootStyle = view.getComputedStyle(bubble);
   const variableDeclarations = pointerBubbleVariables
-    .map((property) => [property, rootStyle.getPropertyValue(property).trim()] as const)
+    .map(
+      (property) =>
+        [property, rootStyle.getPropertyValue(property).trim()] as const,
+    )
     .filter(([, value]) => value)
     .map(([property, value]) => `${property}: ${value};`);
 
@@ -253,11 +252,14 @@ export function createRenderedOutput(root: ParentNode): RenderedOutput | null {
 
       const style = view.getComputedStyle(element);
       const declarations = propertiesBySelector[selector]
-        .map((property) => [property, style.getPropertyValue(property).trim()] as const)
+        .map(
+          (property) =>
+            [property, style.getPropertyValue(property).trim()] as const,
+        )
         .filter(([, value]) => value)
         .map(([property, value]) => `${property}: ${value};`);
 
-      if (selector === ".better-map-marker") {
+      if (selector === ".pointer-bubble") {
         declarations.unshift(...variableDeclarations);
       }
 

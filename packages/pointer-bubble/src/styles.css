@@ -1,80 +1,267 @@
-/* Declare layer order before auto-injected defaults can precede Tailwind. */
+/* Keep component defaults below application utility layers so consumer classes can override them. */
 @layer theme, base, components, utilities;
 
-/* Standalone defaults. The components layer lets application CSS and Tailwind
-   utilities override these styles without requiring !important. No global reset. */
 @layer components {
-  :where(.better-map-marker) {
-    --pb-bubble: 4rem; --pb-border: 6px; --pb-px: .75rem; --pb-py: .5rem;
-    --pb-font: .875rem; --pb-content: 2.5rem; --pb-content-px: .75rem;
-    --pb-shadow-mt: 2rem; --pb-shadow-h: .625rem; --pb-shadow-w: 2.25rem; --pb-pulse: 6rem;
-    position: relative; display: inline-flex; flex-direction: column;
-    align-items: center; padding-bottom: .5rem;
+  :where(.pointer-bubble) {
+    --pb-bubble: 4rem;
+    --pb-border: 6px;
+    --pb-px: 0.75rem;
+    --pb-py: 0.5rem;
+    --pb-font: 0.875rem;
+    --pb-content: 2.5rem;
+    --pb-content-px: 0.75rem;
+    --pb-shadow-mt: 2rem;
+    --pb-shadow-h: 0.625rem;
+    --pb-shadow-w: 2.25rem;
+    --pb-pulse: 6rem;
+    --pb-tip-outer-left: 17px;
+    --pb-tip-outer-right: 17px;
+    --pb-tip-outer-top: 30px;
+    --pb-tip-inner-left: 10px;
+    --pb-tip-inner-right: 10px;
+    --pb-tip-inner-top: 30px;
+    --pb-tip-inner-offset: 8px;
+
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0.5rem;
   }
-  :where(.better-map-marker[data-size="xxs"]) {
-    --pb-bubble: 1.75rem; --pb-border: 3px; --pb-px: .25rem; --pb-py: 0;
-    --pb-font: 8px; --pb-content: 1rem; --pb-content-px: .125rem;
-    --pb-shadow-mt: 1rem; --pb-shadow-h: .25rem; --pb-shadow-w: 1.25rem; --pb-pulse: 2.5rem;
+
+  :where(.pointer-bubble[data-size="xxs"]) {
+    --pb-bubble: 1.75rem;
+    --pb-border: 3px;
+    --pb-px: 0.25rem;
+    --pb-py: 0;
+    --pb-font: 8px;
+    --pb-content: 1rem;
+    --pb-content-px: 0.125rem;
+    --pb-shadow-mt: 1rem;
+    --pb-shadow-h: 0.25rem;
+    --pb-shadow-w: 1.25rem;
+    --pb-pulse: 2.5rem;
+    --pb-tip-outer-left: 8px;
+    --pb-tip-outer-right: 8px;
+    --pb-tip-outer-top: 12px;
+    --pb-tip-inner-left: 5px;
+    --pb-tip-inner-right: 5px;
+    --pb-tip-inner-top: 12px;
+    --pb-tip-inner-offset: 3px;
   }
-  :where(.better-map-marker[data-size="xs"]) {
-    --pb-bubble: 2.25rem; --pb-border: 4px; --pb-px: .25rem; --pb-py: 0;
-    --pb-font: 10px; --pb-content: 1.25rem; --pb-content-px: .25rem;
-    --pb-shadow-mt: 1.25rem; --pb-shadow-h: .375rem; --pb-shadow-w: 1.5rem; --pb-pulse: 3rem;
+
+  :where(.pointer-bubble[data-size="xs"]) {
+    --pb-bubble: 2.25rem;
+    --pb-border: 4px;
+    --pb-px: 0.25rem;
+    --pb-py: 0;
+    --pb-font: 10px;
+    --pb-content: 1.25rem;
+    --pb-content-px: 0.25rem;
+    --pb-shadow-mt: 1.25rem;
+    --pb-shadow-h: 0.375rem;
+    --pb-shadow-w: 1.5rem;
+    --pb-pulse: 3rem;
+    --pb-tip-outer-left: 10px;
+    --pb-tip-outer-right: 10px;
+    --pb-tip-outer-top: 15px;
+    --pb-tip-inner-left: 6px;
+    --pb-tip-inner-right: 6px;
+    --pb-tip-inner-top: 15px;
+    --pb-tip-inner-offset: 4px;
   }
-  :where(.better-map-marker[data-size="sm"]) {
-    --pb-bubble: 3rem; --pb-border: 5px; --pb-px: .5rem; --pb-py: 0;
-    --pb-font: 11px; --pb-content: 1.75rem; --pb-content-px: .25rem;
-    --pb-shadow-mt: 1.5rem; --pb-shadow-h: .5rem; --pb-shadow-w: 1.75rem; --pb-pulse: 4rem;
+
+  :where(.pointer-bubble[data-size="sm"]) {
+    --pb-bubble: 3rem;
+    --pb-border: 5px;
+    --pb-px: 0.5rem;
+    --pb-py: 0;
+    --pb-font: 11px;
+    --pb-content: 1.75rem;
+    --pb-content-px: 0.25rem;
+    --pb-shadow-mt: 1.5rem;
+    --pb-shadow-h: 0.5rem;
+    --pb-shadow-w: 1.75rem;
+    --pb-pulse: 4rem;
+    --pb-tip-outer-left: 14px;
+    --pb-tip-outer-right: 14px;
+    --pb-tip-outer-top: 20px;
+    --pb-tip-inner-left: 8px;
+    --pb-tip-inner-right: 8px;
+    --pb-tip-inner-top: 20px;
+    --pb-tip-inner-offset: 3px;
   }
-  :where(.better-map-marker[data-size="lg"]) {
-    --pb-bubble: 5rem; --pb-border: 7px; --pb-px: 1rem; --pb-py: .5rem;
-    --pb-font: 1rem; --pb-content: 3rem; --pb-content-px: 1rem;
-    --pb-shadow-mt: 2.5rem; --pb-shadow-h: .75rem; --pb-shadow-w: 2.75rem; --pb-pulse: 7rem;
+
+  :where(.pointer-bubble[data-size="lg"]) {
+    --pb-bubble: 5rem;
+    --pb-border: 7px;
+    --pb-px: 1rem;
+    --pb-py: 0.5rem;
+    --pb-font: 1rem;
+    --pb-content: 3rem;
+    --pb-content-px: 1rem;
+    --pb-shadow-mt: 2.5rem;
+    --pb-shadow-h: 0.75rem;
+    --pb-shadow-w: 2.75rem;
+    --pb-pulse: 7rem;
+    --pb-tip-outer-left: 21px;
+    --pb-tip-outer-right: 21px;
+    --pb-tip-outer-top: 40px;
+    --pb-tip-inner-left: 13px;
+    --pb-tip-inner-right: 13px;
+    --pb-tip-inner-top: 40px;
+    --pb-tip-inner-offset: 7px;
   }
-  :where(.better-map-marker, .better-map-marker .pb-body, .better-map-marker .pb-content) { box-sizing: border-box; }
-  :where(.better-map-marker > .pb-body) {
-    position: relative; display: grid; place-items: center; border-radius: 9999px;
-    font-weight: 700; line-height: 1.25; font-size: var(--pb-font);
-    background: var(--marker-bg); color: var(--marker-text);
-    border: var(--pb-border) solid var(--marker-border);
-    min-height: var(--pb-bubble); min-width: var(--pb-bubble);
+
+  :where(
+    .pointer-bubble,
+    .pointer-bubble .pb-body,
+    .pointer-bubble .pb-content
+  ) {
+    box-sizing: border-box;
+  }
+
+  :where(.pointer-bubble > .pb-body) {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: var(--pb-bubble);
+    min-width: var(--pb-bubble);
     padding: var(--pb-py) var(--pb-px);
-    box-shadow: 0 14px 28px rgba(0,0,0,.28);
-    transition: translate .2s ease-out, scale .2s ease-out;
+    border: var(--pb-border) solid var(--marker-border);
+    border-radius: 9999px;
+    background: var(--marker-bg);
+    color: var(--marker-text);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+    font-size: var(--pb-font);
+    font-weight: 700;
+    line-height: 1.25;
+    transition:
+      translate 0.2s ease-out,
+      scale 0.2s ease-out;
   }
-  :where(.better-map-marker[data-selected] > .pb-body) {
-    translate: 0 -.25rem; scale: 1.05;
-    box-shadow: 0 0 0 4px var(--marker-ring), 0 14px 28px rgba(0,0,0,.28);
+
+  :where(.pointer-bubble[data-selected] > .pb-body) {
+    translate: 0 -0.25rem;
+    scale: 1.05;
+    box-shadow:
+      0 0 0 4px var(--marker-ring),
+      0 14px 28px rgba(0, 0, 0, 0.28);
   }
+
   @media (hover: hover) {
-    :where(.better-map-marker > .pb-body:hover) { translate: 0 -.25rem; scale: 1.05; }
+    :where(.pointer-bubble > .pb-body:hover) {
+      translate: 0 -0.25rem;
+      scale: 1.05;
+    }
   }
-  :where(.better-map-marker .pb-tip) { position: absolute; bottom: 0; }
-  :where(.better-map-marker .pb-tip-outer, .better-map-marker .pb-tip-inner) { position: absolute; left: 50%; translate: -50% 0; }
-  :where(.better-map-marker .pb-tip-outer) { z-index: 0; }
-  :where(.better-map-marker .pb-tip-inner) { top: 100%; z-index: 10; }
-  :where(.better-map-marker .pb-content) {
-    position: relative; z-index: 20; display: grid; place-items: center;
-    border-radius: 9999px; text-align: center; white-space: normal; overflow-wrap: break-word;
-    min-height: var(--pb-content); min-width: var(--pb-content); padding-inline: var(--pb-content-px);
-    background: var(--marker-content-bg); border: 0 solid var(--marker-content-border);
+
+  :where(.pointer-bubble .pb-tip) {
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
   }
-  :where(.better-map-marker .pb-content[data-border]) { border-width: 1px; }
-  :where(.better-map-marker .pb-content[data-background]) { filter: drop-shadow(0 1px 2px rgba(0,0,0,.15)); backdrop-filter: blur(1px); }
-  :where(.better-map-marker > .pb-shadow-wrap) { position: relative; height: 0; width: 100%; }
-  :where(.better-map-marker .pb-shadow) {
-    position: absolute; left: 50%; translate: -50% 0; border-radius: 9999px;
-    background: var(--marker-shadow); margin-top: var(--pb-shadow-mt);
-    height: var(--pb-shadow-h); width: var(--pb-shadow-w); filter: blur(2px);
+
+  :where(.pointer-bubble .pb-tip-outer, .pointer-bubble .pb-tip-inner) {
+    position: absolute;
+    left: 50%;
+    width: 0;
+    height: 0;
+    translate: -50% 0;
   }
-  :where(.better-map-marker > .pb-pulse) {
-    position: absolute; left: 50%; top: 50%; z-index: -10; translate: -50% -50%; border-radius: 9999px;
-    background: var(--marker-pulse); height: var(--pb-pulse); width: var(--pb-pulse); opacity: .2;
-    animation: pointer-bubble-ping 1s cubic-bezier(0,0,.2,1) infinite;
+
+  :where(.pointer-bubble .pb-tip-outer) {
+    top: 0;
+    z-index: 0;
+    border-left: var(--pb-tip-outer-left) solid transparent;
+    border-right: var(--pb-tip-outer-right) solid transparent;
+    border-top: var(--pb-tip-outer-top) solid var(--marker-border);
+  }
+
+  :where(.pointer-bubble .pb-tip-inner) {
+    top: 100%;
+    z-index: 10;
+    margin-top: calc(-1 * var(--pb-tip-inner-offset));
+    border-left: var(--pb-tip-inner-left) solid transparent;
+    border-right: var(--pb-tip-inner-right) solid transparent;
+    border-top: var(--pb-tip-inner-top) solid var(--marker-bg);
+  }
+
+  :where(.pointer-bubble .pb-content) {
+    position: relative;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    min-height: var(--pb-content);
+    min-width: var(--pb-content);
+    padding-inline: var(--pb-content-px);
+    border: 0 solid var(--marker-content-border);
+    border-radius: 9999px;
+    background: var(--marker-content-bg);
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  :where(.pointer-bubble .pb-content[data-border]) {
+    border-width: 1px;
+  }
+
+  :where(.pointer-bubble .pb-content[data-background]) {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+    backdrop-filter: blur(1px);
+  }
+
+  :where(.pointer-bubble > .pb-shadow-wrap) {
+    position: relative;
+    width: 100%;
+    height: 0;
+  }
+
+  :where(.pointer-bubble .pb-shadow) {
+    position: absolute;
+    left: 50%;
+    width: var(--pb-shadow-w);
+    height: var(--pb-shadow-h);
+    margin-top: var(--pb-shadow-mt);
+    translate: -50% 0;
+    border-radius: 9999px;
+    background: var(--marker-shadow);
+    filter: blur(2px);
+  }
+
+  :where(.pointer-bubble > .pb-pulse) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: -10;
+    width: var(--pb-pulse);
+    height: var(--pb-pulse);
+    translate: -50% -50%;
+    border-radius: 9999px;
+    background: var(--marker-pulse);
+    opacity: 0.2;
+    animation: pointer-bubble-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+    pointer-events: none;
   }
 }
-@keyframes pointer-bubble-ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+
+@keyframes pointer-bubble-ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .better-map-marker > .pb-pulse { animation: none; }
-  .better-map-marker > .pb-body { transition: none; }
+  .pointer-bubble > .pb-pulse {
+    animation: none;
+  }
+
+  .pointer-bubble > .pb-body {
+    transition: none;
+  }
 }
