@@ -23,7 +23,7 @@ pointer-bubble/
 │       ├── tsconfig.build.json
 │       └── vite.config.ts
 ├── scripts/                         # repository/release helpers
-├── .github/workflows/               # CI and playground deployment
+├── .github/workflows/               # CI, deployment, and publishing
 ├── package.json                     # workspace orchestration only
 ├── package-lock.json
 └── tsconfig.base.json               # shared TypeScript defaults
@@ -170,11 +170,12 @@ The editable TSX preview depends on external services for Monaco, map tiles, and
 
 ## GitHub Actions
 
-The repository has two GitHub Actions workflows:
+The repository has three GitHub Actions workflows:
 
 ```text
 .github/workflows/ci.yml
 .github/workflows/playground-pages.yml
+.github/workflows/npm-publish.yml
 ```
 
 ### CI
@@ -221,9 +222,36 @@ Enable Pages once under **Settings → Pages → Build and deployment → GitHub
 
 The Vite base path is supplied by the workflow so project Pages URLs such as `moyarich.github.io/pointer-bubble/` work correctly.
 
+### Manual npm publishing
+
+`Publish npm package` is deliberately manual. It has only a `workflow_dispatch` trigger, so pushes, pull requests, merges, tags, releases, and successful CI runs do **not** publish the package.
+
+Configure the repository secret once under **Settings → Secrets and variables → Actions → Secrets**:
+
+```text
+NPM_TOKEN
+```
+
+To publish:
+
+1. update `packages/pointer-bubble/package.json` to a version that does not already exist on npm
+2. merge that version change to `main` and make sure CI succeeds
+3. open **Actions → Publish npm package → Run workflow**
+4. select the `main` branch
+5. choose the npm tag (`latest` by default) and access (`public` by default)
+6. run the workflow
+
+The publish job runs only for `main`, installs the locked dependencies with `npm ci`, passes the repository `NPM_TOKEN` secret to the existing release script, and calls:
+
+```sh
+npm run publish:lib
+```
+
+`npm run publish:lib` performs the repository's typecheck and package tests before calling `npm publish`. The workflow inputs provide `NPM_TAG` and `NPM_ACCESS`, so GitHub repository variables for those values are not required.
+
 ### What happens after a merge to `main`
 
-The workflows now run in sequence rather than duplicating validation work:
+The automatic workflows run in sequence rather than duplicating validation work:
 
 ```text
 merge / push to main
@@ -244,11 +272,7 @@ merge / push to main
 
 If CI fails, the Pages build/deployment jobs are skipped.
 
-The npm package is **not** automatically published by these workflows. Publishing remains an explicit release action through:
-
-```sh
-npm run publish:lib
-```
+The npm publish workflow is separate from this chain and starts only when explicitly run from the Actions tab.
 
 To test a project-subpath-style Pages build locally:
 
