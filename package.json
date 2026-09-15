@@ -17,6 +17,7 @@
     "pack:lib": "npm pack --workspace @moyarich/pointer-bubble --dry-run",
     "release:check": "node scripts/publish.mjs --dry-run",
     "publish:lib": "node scripts/publish.mjs --publish",
+    "screenshots:readme": "node scripts/generate-readme-screenshots.mjs",
     "tasks": "bash scripts/tasks.sh"
   },
   "engines": {
