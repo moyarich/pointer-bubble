@@ -82,6 +82,8 @@ export function EsbuildIframePreview({
   onRenderedOutput?: (output: RenderedOutput | null) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const renderedOutputObserverRef = useRef<MutationObserver | null>(null);
+  const renderedOutputFrameRef = useRef<number | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
@@ -105,6 +107,47 @@ export function EsbuildIframePreview({
     return true;
   }
 
+  function publishCurrentRenderedOutput() {
+    const document = iframeRef.current?.contentDocument;
+    if (!document) return null;
+
+    const output = createRenderedOutput(document);
+    if (!output) return null;
+
+    onRenderedOutput?.(output);
+    publishRenderedOutput(output);
+    return output;
+  }
+
+  function scheduleRenderedOutputCapture() {
+    if (renderedOutputFrameRef.current !== null) {
+      window.cancelAnimationFrame(renderedOutputFrameRef.current);
+    }
+
+    renderedOutputFrameRef.current = window.requestAnimationFrame(() => {
+      renderedOutputFrameRef.current = null;
+      publishCurrentRenderedOutput();
+    });
+  }
+
+  function observeRenderedOutput() {
+    renderedOutputObserverRef.current?.disconnect();
+    renderedOutputObserverRef.current = null;
+
+    const document = iframeRef.current?.contentDocument;
+    if (!document?.documentElement) return;
+
+    renderedOutputObserverRef.current = new MutationObserver(() => {
+      scheduleRenderedOutputCapture();
+    });
+    renderedOutputObserverRef.current.observe(document.documentElement, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+
   useEffect(() => {
     function handlePreviewMessage(event: MessageEvent) {
       if (event.source !== iframeRef.current?.contentWindow || !event.data) return;
@@ -118,12 +161,13 @@ export function EsbuildIframePreview({
         setStatus("ready");
         setErrorMessage("");
         setErrorCategory("Preview error");
-        window.requestAnimationFrame(() => {
-          const document = iframeRef.current?.contentDocument;
-          const output = document ? createRenderedOutput(document) : null;
-          onRenderedOutput?.(output);
-          publishRenderedOutput(output);
-        });
+
+        // React has committed by the time READY arrives. Capture on the next
+        // frame and then keep observing the entire iframe document so computed
+        // CSS also refreshes when Tailwind Play injects/updates styles in <head>
+        // after a live className edit.
+        scheduleRenderedOutputCapture();
+        observeRenderedOutput();
       }
 
       if (event.data.type === "POINTER_BUBBLE_PREVIEW_ERROR") {
@@ -221,6 +265,10 @@ export function EsbuildIframePreview({
     return () => {
       if (previewTimeoutRef.current) {
         window.clearTimeout(previewTimeoutRef.current);
+      }
+      renderedOutputObserverRef.current?.disconnect();
+      if (renderedOutputFrameRef.current !== null) {
+        window.cancelAnimationFrame(renderedOutputFrameRef.current);
       }
     };
   }, []);
