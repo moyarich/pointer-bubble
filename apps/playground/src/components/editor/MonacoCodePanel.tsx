@@ -63,7 +63,7 @@ export function MonacoCodePanel({
     overviewRulerBorder: false,
     renderLineHighlight: "none" as const,
     automaticLayout: true,
-    hover: { enabled: true, above: false, delay: 250, sticky: true },
+    hover: { enabled: true, above: false, delay: 250, sticky: "on" },
   };
 
   return (
