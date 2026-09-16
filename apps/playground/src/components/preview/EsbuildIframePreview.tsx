@@ -82,8 +82,6 @@ export function EsbuildIframePreview({
   onRenderedOutput?: (output: RenderedOutput | null) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const renderedOutputObserverRef = useRef<MutationObserver | null>(null);
-  const renderedOutputFrameRef = useRef<number | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
@@ -92,6 +90,7 @@ export function EsbuildIframePreview({
     useState<PreviewErrorCategory>("Preview error");
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const previewTimeoutRef = useRef<number | null>(null);
+  const renderedOutputTimeoutsRef = useRef<number[]>([]);
   const requestIdRef = useRef(0);
   const activeRequestIdRef = useRef(0);
   const iframeHtml = useMemo(() => createIsolatedPreviewHtml(), []);
@@ -107,45 +106,44 @@ export function EsbuildIframePreview({
     return true;
   }
 
-  function publishCurrentRenderedOutput() {
-    const document = iframeRef.current?.contentDocument;
-    if (!document) return null;
+  function clearRenderedOutputTimeouts() {
+    renderedOutputTimeoutsRef.current.forEach((timeout) =>
+      window.clearTimeout(timeout),
+    );
+    renderedOutputTimeoutsRef.current = [];
+  }
 
-    const output = createRenderedOutput(document);
-    if (!output) return null;
+  function captureRenderedOutput(requestId = activeRequestIdRef.current) {
+    if (requestId !== activeRequestIdRef.current) return;
+
+    const document = iframeRef.current?.contentDocument;
+    const output = document ? createRenderedOutput(document) : null;
+    if (!output) return;
 
     onRenderedOutput?.(output);
     publishRenderedOutput(output);
-    return output;
   }
 
-  function scheduleRenderedOutputCapture() {
-    if (renderedOutputFrameRef.current !== null) {
-      window.cancelAnimationFrame(renderedOutputFrameRef.current);
+  function captureRenderedOutputAfterRender(requestId: number) {
+    clearRenderedOutputTimeouts();
+
+    // React commits and Tailwind Play's generated stylesheet can settle on
+    // different turns. Capture immediately, after paint, and again after the
+    // utility stylesheet has had a chance to refresh. Each capture replaces
+    // the CSS tab with the latest computed styles for this editor revision.
+    captureRenderedOutput(requestId);
+
+    window.requestAnimationFrame(() => {
+      if (requestId !== activeRequestIdRef.current) return;
+      captureRenderedOutput(requestId);
+      window.requestAnimationFrame(() => captureRenderedOutput(requestId));
+    });
+
+    for (const delay of [75, 200]) {
+      renderedOutputTimeoutsRef.current.push(
+        window.setTimeout(() => captureRenderedOutput(requestId), delay),
+      );
     }
-
-    renderedOutputFrameRef.current = window.requestAnimationFrame(() => {
-      renderedOutputFrameRef.current = null;
-      publishCurrentRenderedOutput();
-    });
-  }
-
-  function observeRenderedOutput() {
-    renderedOutputObserverRef.current?.disconnect();
-    renderedOutputObserverRef.current = null;
-
-    const document = iframeRef.current?.contentDocument;
-    if (!document?.documentElement) return;
-
-    renderedOutputObserverRef.current = new MutationObserver(() => {
-      scheduleRenderedOutputCapture();
-    });
-    renderedOutputObserverRef.current.observe(document.documentElement, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
   }
 
   useEffect(() => {
@@ -161,13 +159,7 @@ export function EsbuildIframePreview({
         setStatus("ready");
         setErrorMessage("");
         setErrorCategory("Preview error");
-
-        // React has committed by the time READY arrives. Capture on the next
-        // frame and then keep observing the entire iframe document so computed
-        // CSS also refreshes when Tailwind Play injects/updates styles in <head>
-        // after a live className edit.
-        scheduleRenderedOutputCapture();
-        observeRenderedOutput();
+        captureRenderedOutputAfterRender(event.data.requestId);
       }
 
       if (event.data.type === "POINTER_BUBBLE_PREVIEW_ERROR") {
@@ -183,7 +175,26 @@ export function EsbuildIframePreview({
 
     window.addEventListener("message", handlePreviewMessage);
     return () => window.removeEventListener("message", handlePreviewMessage);
-  }, [onRenderedOutput]);
+  });
+
+  useEffect(() => {
+    const iframeDocument = iframeRef.current?.contentDocument;
+    if (!iframeLoaded || !iframeDocument?.documentElement) return undefined;
+
+    const observer = new MutationObserver(() => {
+      const requestId = activeRequestIdRef.current;
+      window.requestAnimationFrame(() => captureRenderedOutput(requestId));
+    });
+
+    observer.observe(iframeDocument.documentElement, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => observer.disconnect();
+  }, [iframeLoaded]);
 
   useEffect(() => {
     let cancelled = false;
@@ -205,6 +216,7 @@ export function EsbuildIframePreview({
       hasRunOnceRef.current = true;
       const requestId = ++requestIdRef.current;
       activeRequestIdRef.current = requestId;
+      clearRenderedOutputTimeouts();
 
       try {
         setStatus("loading");
@@ -266,10 +278,7 @@ export function EsbuildIframePreview({
       if (previewTimeoutRef.current) {
         window.clearTimeout(previewTimeoutRef.current);
       }
-      renderedOutputObserverRef.current?.disconnect();
-      if (renderedOutputFrameRef.current !== null) {
-        window.cancelAnimationFrame(renderedOutputFrameRef.current);
-      }
+      clearRenderedOutputTimeouts();
     };
   }, []);
 
