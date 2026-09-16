@@ -226,7 +226,6 @@ export function createIsolatedPreviewHtml() {
       html, body, #root { width: 100%; height: 100%; margin: 0; }
       body { background: #f8fafc; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
       #root { display: grid; place-items: center; min-height: 100%; padding: 2rem; box-sizing: border-box; }
-      .preview-error { max-width: 90%; border: 1px solid #fecaca; background: #fef2f2; color: #991b1b; border-radius: 1rem; padding: 1rem; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; white-space: pre-wrap; }
     </style>
   </head>
   <body>
@@ -242,38 +241,35 @@ export function createIsolatedPreviewHtml() {
         return window.__PREVIEW_HOST_MODULES__ ?? {};
       }
 
-      const previewHostModules = getPreviewHostModules();
-
-      function renderError(message, category = 'Runtime error') {
-        root.render(React.createElement('pre', { className: 'preview-error' }, category + String.fromCharCode(10) + message));
-      }
-
       window.addEventListener('message', (event) => {
         if (event.source !== window.parent || !event.data || event.data.type !== 'POINTER_BUBBLE_RUN_PREVIEW') return;
 
-        try {
-          const modules = getPreviewHostModules();
-          React = modules.react;
-          createRoot = modules['react-dom/client'].createRoot;
-          root?.unmount();
-          rootElement.innerHTML = '';
-          root = createRoot(rootElement);
+        const requestId = event.data.requestId;
 
-          delete globalThis.__POINTER_BUBBLE_DEMO__;
+        try {
           const hostModules = getPreviewHostModules();
+          React = hostModules.react;
+          createRoot = hostModules['react-dom/client'].createRoot;
           const runtimePointerBubble = hostModules['@moyarich/pointer-bubble']?.PointerBubble;
           const runtimeMapLibre = hostModules['maplibre-gl'];
           const runtimeReactDomClient = hostModules['react-dom/client'] ?? { createRoot };
+
+          delete globalThis.__POINTER_BUBBLE_DEMO__;
           const getDemo = new Function('React', 'PointerBubble', 'maplibregl', 'createRoot', 'passedModules', event.data.compiledCode + String.fromCharCode(10) + 'return globalThis.__POINTER_BUBBLE_DEMO__;');
           const Demo = getDemo(React, runtimePointerBubble, runtimeMapLibre, runtimeReactDomClient.createRoot ?? createRoot, hostModules);
           if (typeof Demo !== 'function') throw new Error('The preview code must export a Demo component.');
 
+          // Only replace the visible preview after the new source has evaluated
+          // successfully. Temporary syntax/runtime issues while typing therefore
+          // leave the last good preview visible.
+          root?.unmount();
+          rootElement.innerHTML = '';
+          root = createRoot(rootElement);
           root.render(React.createElement(Demo));
-          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_READY' }, '*');
+          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_READY', requestId }, '*');
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
-          renderError(message, 'Runtime error');
-          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_ERROR', message, category: 'Runtime error' }, '*');
+          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_ERROR', requestId, message, category: 'Runtime error' }, '*');
         }
       });
     </script>
