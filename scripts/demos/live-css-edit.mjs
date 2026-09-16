@@ -3,15 +3,19 @@ import { chromium } from 'playwright';
 
 const playgroundUrl = process.env.PLAYGROUND_URL || 'http://127.0.0.1:5173';
 
-const initialColor = '#79bd9a';
-const editedColor = '#2563eb';
+const originalBorderColor = '#365314';
+const editedBorderColor = '#ff0a54ff';
 const editedSource = `import { PointerBubble } from '@moyarich/pointer-bubble';
-import { Leaf } from 'lucide-react';
+import { Sprout } from 'lucide-react';
 
 export function Demo() {
   return (
-    <PointerBubble backgroundColor="${editedColor}" borderColor="#18173b" selected size="lg">
-      <Leaf className="h-5 w-5" strokeWidth={3} />
+    <PointerBubble
+      backgroundColor="#84cc16"
+      borderColor="${editedBorderColor}"
+      size="xxs"
+    >
+      <Sprout className="h-3 w-3" strokeWidth={3} />
     </PointerBubble>
   );
 }
@@ -23,7 +27,10 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 try {
   await page.goto(playgroundUrl, { waitUntil: 'networkidle' });
 
-  await page.getByRole('button', { name: 'Open Map Pin source code' }).click();
+  const xxsCard = page.getByText('XXS', { exact: true }).first();
+  const card = xxsCard.locator('xpath=ancestor::*[@role="button"][1]');
+  await card.click();
+
   const drawer = page.getByRole('dialog');
   await drawer.waitFor();
 
@@ -39,16 +46,17 @@ try {
 
   await assertEventually(async () => {
     const text = await cssPanel.locator('.view-lines').innerText();
-    return text.includes(`--pb-background-color: ${initialColor};`) &&
-      text.includes('--pb-bubble-size: 4rem;');
+    return text.includes(`--pb-border-color: ${originalBorderColor};`) &&
+      text.includes('--pb-bubble-size: 1.75rem;');
   });
 
   const sourceInput = sourcePanel.locator('textarea.inputarea');
   await sourceInput.click({ force: true });
-  const sourceHasFocus = await sourcePanel.evaluate((element) =>
-    element.contains(document.activeElement),
+  assert.equal(
+    await sourcePanel.evaluate((element) => element.contains(document.activeElement)),
+    true,
+    'Monaco source editor should retain focus before editing',
   );
-  assert.equal(sourceHasFocus, true, 'Monaco source editor should retain focus before editing');
 
   await page.keyboard.press(process.platform === 'darwin' ? 'Meta+A' : 'Control+A');
   await page.keyboard.insertText(editedSource);
@@ -60,14 +68,18 @@ try {
   );
 
   await assertEventually(async () => {
+    const emptyState = await drawer.getByText('No rendered PointerBubble output is available.').count();
+    if (emptyState > 0) return false;
+
     const text = await cssPanel.locator('.view-lines').innerText();
-    return text.includes(`--pb-background-color: ${editedColor};`) &&
-      text.includes('--pb-bubble-size: 5rem;');
+    return text.includes('--pb-border-color: rgba(255, 10, 84, 1);') ||
+      text.includes('--pb-border-color: rgb(255, 10, 84);') ||
+      text.includes(`--pb-border-color: ${editedBorderColor};`);
   }, 8000);
 
   const finalCss = await cssPanel.locator('.view-lines').innerText();
-  assert.match(finalCss, /--pb-background-color:\s*#2563eb;/);
-  assert.match(finalCss, /--pb-bubble-size:\s*5rem;/);
+  assert.match(finalCss, /--pb-bubble-size:\s*1\.75rem;/);
+  assert.doesNotMatch(finalCss, /--pb-border-color:\s*#365314;/);
 } finally {
   await browser.close();
 }
