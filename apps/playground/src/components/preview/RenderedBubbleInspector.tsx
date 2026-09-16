@@ -52,7 +52,24 @@ function readRenderedOutput(host: HTMLElement): RenderedOutput | null {
 
 function setPreviewVisibility(host: HTMLElement, visible: boolean) {
   for (const child of findPreviewChildren(host)) {
-    child.style.display = visible ? "" : "none";
+    if (visible) {
+      child.style.visibility = "";
+      child.style.pointerEvents = "";
+      child.style.position = "";
+      child.style.inset = "";
+      child.style.opacity = "";
+      continue;
+    }
+
+    // Keep the preview mounted and renderable while HTML/CSS is visible.
+    // `display: none` prevents reliable computed-style capture from the
+    // iframe after Monaco edits. Visually remove the preview instead without
+    // taking it out of the rendering/computed-style tree.
+    child.style.visibility = "hidden";
+    child.style.pointerEvents = "none";
+    child.style.position = "absolute";
+    child.style.inset = "0";
+    child.style.opacity = "0";
   }
 }
 
@@ -93,8 +110,15 @@ export function RenderedBubbleInspector() {
     let iframeLoadHandler: (() => void) | null = null;
 
     function updateOutput(nextOutput: RenderedOutput | null) {
+      // During the first Monaco edit the drawer swaps the static preview for
+      // the iframe preview. There is a short interval with no PointerBubble in
+      // the host. Do not erase the last valid HTML/CSS during that transition;
+      // the freshly rendered iframe will replace it as soon as compilation
+      // completes.
+      if (!nextOutput) return;
+
       setOutput((current) =>
-        current?.html === nextOutput?.html && current?.css === nextOutput?.css
+        current?.html === nextOutput.html && current?.css === nextOutput.css
           ? current
           : nextOutput,
       );
@@ -223,10 +247,12 @@ export function RenderedBubbleInspector() {
     const originalDisplay = host.style.display;
     const originalFlexDirection = host.style.flexDirection;
     const originalOverflow = host.style.overflow;
+    const originalPosition = host.style.position;
 
     host.style.display = "flex";
     host.style.flexDirection = "column";
     host.style.overflow = "hidden";
+    host.style.position = "relative";
 
     return () => {
       removePreviewHostClasses();
@@ -234,6 +260,7 @@ export function RenderedBubbleInspector() {
       host.style.display = originalDisplay;
       host.style.flexDirection = originalFlexDirection;
       host.style.overflow = originalOverflow;
+      host.style.position = originalPosition;
     };
   }, [host]);
 

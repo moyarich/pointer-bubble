@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { PointerBubble } from "@moyarich/pointer-bubble";
+import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 
 import * as maplibregl from "../maplibre";
@@ -38,7 +39,7 @@ import {
 function createPreviewHostModules() {
   return {
     react: React,
-    "react-dom": { createRoot },
+    "react-dom": { flushSync },
     "react-dom/client": { createRoot },
     "maplibre-gl": maplibregl,
     "lucide-react": {
@@ -113,24 +114,38 @@ export function EsbuildIframePreview({
     renderedOutputTimeoutsRef.current = [];
   }
 
+  function markPreviewReady() {
+    if (previewTimeoutRef.current) {
+      window.clearTimeout(previewTimeoutRef.current);
+      previewTimeoutRef.current = null;
+    }
+    setStatus("ready");
+    setErrorMessage("");
+    setErrorCategory("Preview error");
+  }
+
   function captureRenderedOutput(requestId = activeRequestIdRef.current) {
-    if (requestId !== activeRequestIdRef.current) return;
+    if (requestId !== activeRequestIdRef.current) return false;
 
     const document = iframeRef.current?.contentDocument;
     const output = document ? createRenderedOutput(document) : null;
-    if (!output) return;
+    if (!output) return false;
 
     onRenderedOutput?.(output);
     publishRenderedOutput(output);
+    markPreviewReady();
+    return true;
+  }
+
+  function scheduleRenderedOutputCaptures(requestId: number) {
+    for (const delay of [25, 75, 200, 500]) {
+      renderedOutputTimeoutsRef.current.push(
+        window.setTimeout(() => captureRenderedOutput(requestId), delay),
+      );
+    }
   }
 
   function captureRenderedOutputAfterRender(requestId: number) {
-    clearRenderedOutputTimeouts();
-
-    // React commits and Tailwind Play's generated stylesheet can settle on
-    // different turns. Capture immediately, after paint, and again after the
-    // utility stylesheet has had a chance to refresh. Each capture replaces
-    // the CSS tab with the latest computed styles for this editor revision.
     captureRenderedOutput(requestId);
 
     window.requestAnimationFrame(() => {
@@ -138,12 +153,6 @@ export function EsbuildIframePreview({
       captureRenderedOutput(requestId);
       window.requestAnimationFrame(() => captureRenderedOutput(requestId));
     });
-
-    for (const delay of [75, 200]) {
-      renderedOutputTimeoutsRef.current.push(
-        window.setTimeout(() => captureRenderedOutput(requestId), delay),
-      );
-    }
   }
 
   useEffect(() => {
@@ -152,13 +161,7 @@ export function EsbuildIframePreview({
       if (event.data.requestId !== activeRequestIdRef.current) return;
 
       if (event.data.type === "POINTER_BUBBLE_PREVIEW_READY") {
-        if (previewTimeoutRef.current) {
-          window.clearTimeout(previewTimeoutRef.current);
-          previewTimeoutRef.current = null;
-        }
-        setStatus("ready");
-        setErrorMessage("");
-        setErrorCategory("Preview error");
+        markPreviewReady();
         captureRenderedOutputAfterRender(event.data.requestId);
       }
 
@@ -185,8 +188,6 @@ export function EsbuildIframePreview({
     const observer = new MutationObserver(() => {
       const requestId = activeRequestIdRef.current;
       window.clearTimeout(captureTimer);
-      // Tailwind can update its stylesheet after React commits. Capture those
-      // changes even while the preview is hidden behind the HTML/CSS tabs.
       captureTimer = window.setTimeout(() => captureRenderedOutput(requestId), 0);
     });
 
@@ -265,6 +266,12 @@ export function EsbuildIframePreview({
           },
           "*",
         );
+
+        // The preview iframe can be hidden while the CSS tab is active. Hidden
+        // iframes may pause requestAnimationFrame, so do not rely on the
+        // iframe's READY paint callback to refresh computed CSS. Poll from the
+        // visible parent document after every successful compile as well.
+        scheduleRenderedOutputCaptures(requestId);
       } catch (error) {
         if (cancelled || requestId !== activeRequestIdRef.current) return;
         setStatus("error");
