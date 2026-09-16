@@ -28,7 +28,7 @@ export function RenderedCodeTab({
   if (!code) {
     return (
       <div className="flex h-full min-h-[220px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-950 px-6 text-center text-xs text-slate-400">
-        Waiting for rendered PointerBubble output…
+        No rendered PointerBubble output is available.
       </div>
     );
   }
