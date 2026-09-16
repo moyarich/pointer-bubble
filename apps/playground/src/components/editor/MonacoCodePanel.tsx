@@ -55,7 +55,7 @@ export function MonacoCodePanel({
     fontSize: 13,
     lineNumbersMinChars: 3,
     scrollBeyondLastLine: false,
-    fixedOverflowWidgets: true,
+    fixedOverflowWidgets: false,
     wordWrap: "on" as const,
     padding: { top: 14, bottom: 14 },
     overviewRulerBorder: false,
