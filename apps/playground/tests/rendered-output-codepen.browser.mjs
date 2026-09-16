@@ -17,8 +17,8 @@ const page = await context.newPage();
 try {
   await page.goto(playgroundUrl, { waitUntil: 'networkidle' });
 
-  const xxsCard = page.getByText('XXS', { exact: true }).first();
-  await xxsCard.locator('xpath=ancestor::*[@role="button"][1]').click();
+  const xsCard = page.getByText('XS', { exact: true }).first();
+  await xsCard.locator('xpath=ancestor::*[@role="button"][1]').click();
 
   const drawer = page.getByRole('dialog');
   await drawer.waitFor();
@@ -36,14 +36,22 @@ try {
   assert.match(html, /data-pb-export-id="0"/);
   assert.match(css, /\[data-pb-export-id="0"\]/);
   assert.match(css, /box-sizing:\s*border-box;/);
-  assert.match(css, /--pb-bubble-size:\s*1\.75rem;/);
+  assert.match(css, /--pb-bubble-size:\s*2\.25rem;/);
+  assert.doesNotMatch(css, /--vscode-/);
+  assert.doesNotMatch(css, /--monaco-/);
+  assert.doesNotMatch(css, /--tw-/);
+  assert.doesNotMatch(css, /visibility:\s*hidden;/);
 
   const codepen = await context.newPage();
   await codepen.setContent(`<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <style>${css}</style>
+    <style>
+      html, body { margin: 0; }
+      body { padding: 40px; }
+      ${css}
+    </style>
   </head>
   <body>
     ${html}
@@ -54,10 +62,11 @@ try {
   await exportedBubble.waitFor();
   const exportedSnapshot = await readVisualSnapshot(exportedBubble);
 
+  assert.notEqual(exportedSnapshot.visibility, 'hidden');
   assertVisualSnapshotEqual(exportedSnapshot, sourceSnapshot);
 
-  // The example icon uses Tailwind classes (h-3 w-3). The exported snapshot
-  // must preserve those dimensions even in this clean page with no Tailwind.
+  // The XS example icon uses Tailwind classes (h-3.5 w-3.5). The exported
+  // snapshot must preserve those dimensions in a clean page with no Tailwind.
   assert.ok(sourceSnapshot.svgWidth > 0 && sourceSnapshot.svgHeight > 0);
   assertClose(exportedSnapshot.svgWidth, sourceSnapshot.svgWidth, 'SVG width');
   assertClose(exportedSnapshot.svgHeight, sourceSnapshot.svgHeight, 'SVG height');
@@ -93,12 +102,14 @@ async function readVisualSnapshot(bubble) {
     const bodyRect = body.getBoundingClientRect();
     const contentRect = content.getBoundingClientRect();
     const svgRect = svg.getBoundingClientRect();
+    const bubbleStyle = getComputedStyle(element);
     const bodyStyle = getComputedStyle(body);
     const contentStyle = getComputedStyle(content);
     const svgStyle = getComputedStyle(svg);
     const tipStyle = tipOuter ? getComputedStyle(tipOuter) : null;
 
     return {
+      visibility: bubbleStyle.visibility,
       bubbleWidth: bubbleRect.width,
       bubbleHeight: bubbleRect.height,
       bodyWidth: bodyRect.width,
