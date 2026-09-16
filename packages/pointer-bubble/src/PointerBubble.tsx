@@ -61,13 +61,13 @@ export function PointerBubble({
   ...rootProps
 }: PointerBubbleProps) {
   const bubbleStyle = {
-    "--pb-bg": backgroundColor,
+    "--pb-background-color": backgroundColor,
     "--pb-border-color": borderColor,
     "--pb-text-color": textColor,
-    "--pb-ring-color": selectedRingColor,
+    "--pb-selected-ring-color": selectedRingColor,
     "--pb-pulse-color": pulseColor ?? backgroundColor,
     "--pb-shadow-color": shadowColor,
-    "--pb-content-bg": showContentBackground
+    "--pb-content-background-color": showContentBackground
       ? contentBackgroundColor
       : "transparent",
     "--pb-content-border-color": showContentBorder
