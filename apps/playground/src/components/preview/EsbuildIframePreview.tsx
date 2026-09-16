@@ -181,9 +181,13 @@ export function EsbuildIframePreview({
     const iframeDocument = iframeRef.current?.contentDocument;
     if (!iframeLoaded || !iframeDocument?.documentElement) return undefined;
 
+    let captureTimer: number | undefined;
     const observer = new MutationObserver(() => {
       const requestId = activeRequestIdRef.current;
-      window.requestAnimationFrame(() => captureRenderedOutput(requestId));
+      window.clearTimeout(captureTimer);
+      // Tailwind can update its stylesheet after React commits. Capture those
+      // changes even while the preview is hidden behind the HTML/CSS tabs.
+      captureTimer = window.setTimeout(() => captureRenderedOutput(requestId), 0);
     });
 
     observer.observe(iframeDocument.documentElement, {
@@ -193,7 +197,10 @@ export function EsbuildIframePreview({
       characterData: true,
     });
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(captureTimer);
+    };
   }, [iframeLoaded]);
 
   useEffect(() => {

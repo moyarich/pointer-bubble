@@ -13,7 +13,7 @@
     "build:lib": "npm run build --workspace @moyarich/pointer-bubble",
     "build:playground": "npm run build --workspace @moyarich/pointer-bubble-playground",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspace @moyarich/pointer-bubble",
+    "test": "npm run test --workspace @moyarich/pointer-bubble && node --test apps/playground/tests/*.test.mjs",
     "pack:lib": "npm pack --workspace @moyarich/pointer-bubble --dry-run",
     "release:check": "node scripts/publish.mjs --dry-run",
     "publish:first": "node scripts/publish.mjs --publish-first",

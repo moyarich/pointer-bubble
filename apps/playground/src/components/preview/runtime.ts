@@ -307,15 +307,20 @@ export function createIsolatedPreviewHtml() {
           );
           if (typeof Demo !== 'function') throw new Error('The preview code must export a Demo component.');
 
-          root ??= createRoot(rootElement);
-          root.render(React.createElement(Demo));
+          function CommittedPreview() {
+            // Hidden iframes may suspend animation frames while the CSS tab is
+            // open. Notify the host after React commits, independent of paint.
+            React.useLayoutEffect(() => {
+              window.parent.postMessage(
+                { type: 'POINTER_BUBBLE_PREVIEW_READY', requestId },
+                '*',
+              );
+            }, []);
+            return React.createElement(Demo);
+          }
 
-          requestAnimationFrame(() => {
-            window.parent.postMessage(
-              { type: 'POINTER_BUBBLE_PREVIEW_READY', requestId },
-              '*',
-            );
-          });
+          root ??= createRoot(rootElement);
+          root.render(React.createElement(CommittedPreview));
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
           window.parent.postMessage(

@@ -7,8 +7,10 @@ const zoomStep = 0.25;
 
 function setBubbleZoom(root: ParentNode, zoom: number) {
   root.querySelectorAll<HTMLElement>(".pointer-bubble").forEach((bubble) => {
-    bubble.style.scale = String(zoom);
-    bubble.style.transformOrigin = "center";
+    if (bubble.style.scale !== String(zoom)) bubble.style.scale = String(zoom);
+    if (bubble.style.transformOrigin !== "center") {
+      bubble.style.transformOrigin = "center";
+    }
   });
 }
 

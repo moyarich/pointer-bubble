@@ -93,7 +93,11 @@ export function RenderedBubbleInspector() {
     let iframeLoadHandler: (() => void) | null = null;
 
     function updateOutput(nextOutput: RenderedOutput | null) {
-      if (nextOutput) setOutput(nextOutput);
+      setOutput((current) =>
+        current?.html === nextOutput?.html && current?.css === nextOutput?.css
+          ? current
+          : nextOutput,
+      );
     }
 
     function disconnectIframeObserver() {
