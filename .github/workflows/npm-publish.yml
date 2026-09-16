@@ -35,7 +35,7 @@ jobs:
           node-version: 24
           cache: npm
       - name: Install dependencies from package.json
-        run: npm install --package-lock=false
+        run: npm install --package-lock=false --include=optional
       - name: Show package version
         run: node -p "'Publishing @moyarich/pointer-bubble@' + require('./packages/pointer-bubble/package.json').version"
       - name: Publish package
