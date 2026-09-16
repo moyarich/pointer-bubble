@@ -4,7 +4,7 @@
 @layer components {
   :where(.pointer-bubble) {
     --pb-bubble: 4rem;
-    --pb-border: 6px;
+    --pb-border-width: 6px;
     --pb-px: 0.75rem;
     --pb-py: 0.5rem;
     --pb-font: 0.875rem;
@@ -13,7 +13,7 @@
     --pb-shadow-mt: 2rem;
     --pb-shadow-h: 0.625rem;
     --pb-shadow-w: 2.25rem;
-    --pb-pulse: 6rem;
+    --pb-pulse-size: 6rem;
     --pb-tip-outer-left: 17px;
     --pb-tip-outer-right: 17px;
     --pb-tip-outer-top: 30px;
@@ -31,7 +31,7 @@
 
   :where(.pointer-bubble[data-size="xxs"]) {
     --pb-bubble: 1.75rem;
-    --pb-border: 3px;
+    --pb-border-width: 3px;
     --pb-px: 0.25rem;
     --pb-py: 0;
     --pb-font: 8px;
@@ -40,7 +40,7 @@
     --pb-shadow-mt: 1rem;
     --pb-shadow-h: 0.25rem;
     --pb-shadow-w: 1.25rem;
-    --pb-pulse: 2.5rem;
+    --pb-pulse-size: 2.5rem;
     --pb-tip-outer-left: 8px;
     --pb-tip-outer-right: 8px;
     --pb-tip-outer-top: 12px;
@@ -52,7 +52,7 @@
 
   :where(.pointer-bubble[data-size="xs"]) {
     --pb-bubble: 2.25rem;
-    --pb-border: 4px;
+    --pb-border-width: 4px;
     --pb-px: 0.25rem;
     --pb-py: 0;
     --pb-font: 10px;
@@ -61,7 +61,7 @@
     --pb-shadow-mt: 1.25rem;
     --pb-shadow-h: 0.375rem;
     --pb-shadow-w: 1.5rem;
-    --pb-pulse: 3rem;
+    --pb-pulse-size: 3rem;
     --pb-tip-outer-left: 10px;
     --pb-tip-outer-right: 10px;
     --pb-tip-outer-top: 15px;
@@ -73,7 +73,7 @@
 
   :where(.pointer-bubble[data-size="sm"]) {
     --pb-bubble: 3rem;
-    --pb-border: 5px;
+    --pb-border-width: 5px;
     --pb-px: 0.5rem;
     --pb-py: 0;
     --pb-font: 11px;
@@ -82,7 +82,7 @@
     --pb-shadow-mt: 1.5rem;
     --pb-shadow-h: 0.5rem;
     --pb-shadow-w: 1.75rem;
-    --pb-pulse: 4rem;
+    --pb-pulse-size: 4rem;
     --pb-tip-outer-left: 14px;
     --pb-tip-outer-right: 14px;
     --pb-tip-outer-top: 20px;
@@ -94,7 +94,7 @@
 
   :where(.pointer-bubble[data-size="lg"]) {
     --pb-bubble: 5rem;
-    --pb-border: 7px;
+    --pb-border-width: 7px;
     --pb-px: 1rem;
     --pb-py: 0.5rem;
     --pb-font: 1rem;
@@ -103,7 +103,7 @@
     --pb-shadow-mt: 2.5rem;
     --pb-shadow-h: 0.75rem;
     --pb-shadow-w: 2.75rem;
-    --pb-pulse: 7rem;
+    --pb-pulse-size: 7rem;
     --pb-tip-outer-left: 21px;
     --pb-tip-outer-right: 21px;
     --pb-tip-outer-top: 40px;
@@ -128,7 +128,7 @@
     min-height: var(--pb-bubble);
     min-width: var(--pb-bubble);
     padding: var(--pb-py) var(--pb-px);
-    border: var(--pb-border) solid var(--pb-border-color);
+    border: var(--pb-border-width) solid var(--pb-border-color);
     border-radius: 9999px;
     background: var(--pb-bg);
     color: var(--pb-text-color);
@@ -237,8 +237,8 @@
     left: 50%;
     top: 50%;
     z-index: -10;
-    width: var(--pb-pulse);
-    height: var(--pb-pulse);
+    width: var(--pb-pulse-size);
+    height: var(--pb-pulse-size);
     translate: -50% -50%;
     border-radius: 9999px;
     background: var(--pb-pulse-color);
