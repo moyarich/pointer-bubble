@@ -51,6 +51,29 @@ function setPreviewVisibility(host: HTMLElement, visible: boolean) {
   for (const child of findPreviewChildren(host)) child.hidden = !visible;
 }
 
+function decoratePreviewHost(host: HTMLElement) {
+  host.classList.add("playground-preview-host");
+
+  const livePreviewLabel = Array.from(host.querySelectorAll("span")).find(
+    (element) => element.textContent?.trim() === "Live Preview",
+  );
+  const toolbar = livePreviewLabel?.parentElement;
+  toolbar?.classList.add("playground-preview-toolbar");
+
+  const actions = toolbar?.lastElementChild;
+  if (actions instanceof HTMLElement) {
+    actions.classList.add("playground-preview-actions");
+  }
+
+  return () => {
+    host.classList.remove("playground-preview-host");
+    toolbar?.classList.remove("playground-preview-toolbar");
+    if (actions instanceof HTMLElement) {
+      actions.classList.remove("playground-preview-actions");
+    }
+  };
+}
+
 export function RenderedBubbleInspector() {
   const [host, setHost] = useState<HTMLElement | null>(null);
   const [output, setOutput] = useState<RenderedOutput | null>(null);
@@ -165,6 +188,7 @@ export function RenderedBubbleInspector() {
   useEffect(() => {
     if (!host) return;
 
+    const removePreviewHostClasses = decoratePreviewHost(host);
     const originalDisplay = host.style.display;
     const originalFlexDirection = host.style.flexDirection;
     const originalOverflow = host.style.overflow;
@@ -175,6 +199,7 @@ export function RenderedBubbleInspector() {
     setPreviewVisibility(host, tab === "preview");
 
     return () => {
+      removePreviewHostClasses();
       setPreviewVisibility(host, true);
       host.style.display = originalDisplay;
       host.style.flexDirection = originalFlexDirection;
@@ -202,17 +227,17 @@ export function RenderedBubbleInspector() {
       data-rendered-output-inspector=""
       className={
         showingCode
-          ? "order-first flex min-h-0 flex-1 flex-col"
-          : "order-first shrink-0"
+          ? "rendered-output-inspector order-first flex min-h-0 flex-1 flex-col"
+          : "rendered-output-inspector order-first shrink-0"
       }
     >
-      <div className="mb-3 grid grid-cols-3 rounded-xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
+      <div className="rendered-output-tabs mb-3 grid grid-cols-3 rounded-xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
         {(["preview", "html", "css"] as const).map((value) => (
           <button
             key={value}
             type="button"
             onClick={() => setTab(value)}
-            className={`rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide transition ${
+            className={`rendered-output-tab min-w-0 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide transition ${
               tab === value
                 ? "bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200"
                 : "text-slate-500 hover:bg-white/70 hover:text-slate-900"
