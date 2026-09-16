@@ -39,8 +39,8 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies from package.json
+        run: npm install --package-lock=false
       - name: Validate publish version
         env:
           PUBLISH_VERSION: ${{ inputs.version }}
