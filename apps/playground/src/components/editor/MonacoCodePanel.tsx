@@ -3,6 +3,8 @@ import Editor from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { Undo2, Redo2, Check, Copy } from "lucide-react";
 
+const playgroundModuleDiagnosticCodes = [2307, 2792, 7016];
+
 export function MonacoCodePanel({
   code,
   readOnly = true,
@@ -133,6 +135,9 @@ export function MonacoCodePanel({
               defaults.setCompilerOptions({
                 ...defaults.getCompilerOptions(),
                 allowUnreachableCode: true,
+              });
+              defaults.setDiagnosticsOptions({
+                diagnosticCodesToIgnore: playgroundModuleDiagnosticCodes,
               });
             };
 
