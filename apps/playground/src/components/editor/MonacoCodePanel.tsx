@@ -64,9 +64,9 @@ export function MonacoCodePanel({
   };
 
   return (
-    <div className="relative z-10 flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-[#0f172a] p-1.5 shadow-2xl">
-      <div className="flex items-center justify-between gap-3 rounded-t-xl border-b border-white/10 bg-slate-950 px-4 py-2">
-        <div className="flex min-w-0 items-center gap-2">
+    <div className="playground-code-panel relative z-10 flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-[#0f172a] p-1.5 shadow-2xl">
+      <div className="playground-code-panel__toolbar flex items-center justify-between gap-3 rounded-t-xl border-b border-white/10 bg-slate-950 px-4 py-2">
+        <div className="playground-code-panel__meta flex min-w-0 items-center gap-2">
           <span className="min-w-0 truncate text-xs font-semibold text-slate-300">
             {filename}
           </span>
@@ -74,7 +74,7 @@ export function MonacoCodePanel({
             {language}
           </span>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="playground-code-panel__actions flex shrink-0 items-center gap-2">
           {!readOnly && (
             <>
               <button
@@ -85,7 +85,7 @@ export function MonacoCodePanel({
                 title="Undo"
               >
                 <Undo2 className="h-3.5 w-3.5" />
-                Undo
+                <span className="playground-code-panel__action-label">Undo</span>
               </button>
               <button
                 type="button"
@@ -95,7 +95,7 @@ export function MonacoCodePanel({
                 title="Redo"
               >
                 <Redo2 className="h-3.5 w-3.5" />
-                Redo
+                <span className="playground-code-panel__action-label">Redo</span>
               </button>
             </>
           )}
@@ -111,7 +111,9 @@ export function MonacoCodePanel({
               ) : (
                 <Copy className="h-3.5 w-3.5" />
               )}
-              {copied ? "Copied" : "Copy"}
+              <span className="playground-code-panel__action-label">
+                {copied ? "Copied" : "Copy"}
+              </span>
             </button>
           )}
         </div>
