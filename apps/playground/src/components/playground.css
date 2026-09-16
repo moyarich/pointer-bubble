@@ -10,6 +10,7 @@
 
 .monaco-editor,
 .monaco-editor-background,
+.monaco-editor .overflow-guard,
 .monaco-editor .inputarea.ime-input {
   overflow: visible !important;
 }
