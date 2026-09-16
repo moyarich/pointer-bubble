@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 
 import {
   createRenderedOutput,
+  renderedOutputEventName,
   type RenderedOutput,
 } from "@/utils/renderedOutput";
 import { CssOutputTab } from "./tabs/CssOutputTab";
@@ -50,7 +51,9 @@ function readRenderedOutput(host: HTMLElement): RenderedOutput | null {
 }
 
 function setPreviewVisibility(host: HTMLElement, visible: boolean) {
-  for (const child of findPreviewChildren(host)) child.hidden = !visible;
+  for (const child of findPreviewChildren(host)) {
+    child.style.display = visible ? "" : "none";
+  }
 }
 
 function decoratePreviewHost(host: HTMLElement) {
@@ -86,36 +89,57 @@ export function RenderedBubbleInspector() {
     let hostObserver: MutationObserver | null = null;
     let iframeObserver: MutationObserver | null = null;
     let observedHost: HTMLElement | null = null;
+    let observedIframe: HTMLIFrameElement | null = null;
+    let iframeLoadHandler: (() => void) | null = null;
+
+    function updateOutput(nextOutput: RenderedOutput | null) {
+      if (nextOutput) setOutput(nextOutput);
+    }
+
+    function disconnectIframeObserver() {
+      iframeObserver?.disconnect();
+      iframeObserver = null;
+      if (observedIframe && iframeLoadHandler) {
+        observedIframe.removeEventListener("load", iframeLoadHandler);
+      }
+      observedIframe = null;
+      iframeLoadHandler = null;
+    }
 
     function disconnectPreviewObservers() {
       previewObserver?.disconnect();
       hostObserver?.disconnect();
-      iframeObserver?.disconnect();
       previewObserver = null;
       hostObserver = null;
-      iframeObserver = null;
+      disconnectIframeObserver();
     }
 
     function capture(nextHost: HTMLElement | null) {
       setHost(nextHost);
-      setOutput(nextHost ? readRenderedOutput(nextHost) : null);
+      if (!nextHost) {
+        setOutput(null);
+        return;
+      }
+      updateOutput(readRenderedOutput(nextHost));
     }
 
     function observeIframe(nextHost: HTMLElement) {
-      iframeObserver?.disconnect();
-      iframeObserver = null;
-
       const iframe = nextHost.querySelector<HTMLIFrameElement>("iframe");
+      if (iframe === observedIframe) return;
+
+      disconnectIframeObserver();
       if (!iframe) return;
 
+      observedIframe = iframe;
+
       const captureIframe = () => {
-        setOutput(readRenderedOutput(nextHost));
+        updateOutput(readRenderedOutput(nextHost));
         const iframeDocument = iframe.contentDocument;
         if (!iframeDocument?.body) return;
 
         iframeObserver?.disconnect();
         iframeObserver = new MutationObserver(() => {
-          setOutput(readRenderedOutput(nextHost));
+          updateOutput(readRenderedOutput(nextHost));
         });
         iframeObserver.observe(iframeDocument.body, {
           attributes: true,
@@ -125,7 +149,8 @@ export function RenderedBubbleInspector() {
         });
       };
 
-      iframe.addEventListener("load", captureIframe, { once: true });
+      iframeLoadHandler = captureIframe;
+      iframe.addEventListener("load", captureIframe);
       captureIframe();
     }
 
@@ -140,7 +165,7 @@ export function RenderedBubbleInspector() {
       const previewRoot = findPreviewRoot(nextHost);
       if (previewRoot) {
         previewObserver = new MutationObserver(() => {
-          setOutput(readRenderedOutput(nextHost));
+          updateOutput(readRenderedOutput(nextHost));
           observeIframe(nextHost);
         });
         previewObserver.observe(previewRoot, {
@@ -166,15 +191,22 @@ export function RenderedBubbleInspector() {
       observeIframe(nextHost);
     }
 
+    function handlePublishedOutput(event: Event) {
+      const customEvent = event as CustomEvent<RenderedOutput | null>;
+      updateOutput(customEvent.detail);
+    }
+
     const drawerObserver = new MutationObserver(() => {
       const nextHost = findDrawerOutputHost();
       if (nextHost !== observedHost) observePreview(nextHost);
     });
 
+    window.addEventListener(renderedOutputEventName, handlePublishedOutput);
     drawerObserver.observe(document.body, { childList: true, subtree: true });
     observePreview(findDrawerOutputHost());
 
     return () => {
+      window.removeEventListener(renderedOutputEventName, handlePublishedOutput);
       drawerObserver.disconnect();
       disconnectPreviewObservers();
     };
@@ -191,7 +223,6 @@ export function RenderedBubbleInspector() {
     host.style.display = "flex";
     host.style.flexDirection = "column";
     host.style.overflow = "hidden";
-    setPreviewVisibility(host, tab === "preview");
 
     return () => {
       removePreviewHostClasses();
@@ -200,6 +231,11 @@ export function RenderedBubbleInspector() {
       host.style.flexDirection = originalFlexDirection;
       host.style.overflow = originalOverflow;
     };
+  }, [host]);
+
+  useEffect(() => {
+    if (!host) return;
+    setPreviewVisibility(host, tab === "preview");
   }, [host, tab]);
 
   if (!host) return null;
@@ -211,15 +247,16 @@ export function RenderedBubbleInspector() {
       data-rendered-output-inspector=""
       className={
         showingCode
-          ? "rendered-output-inspector order-first flex min-h-0 flex-1 flex-col"
-          : "rendered-output-inspector order-first shrink-0"
+          ? "rendered-output-inspector relative z-10 order-first flex min-h-0 flex-1 flex-col"
+          : "rendered-output-inspector relative z-10 order-first shrink-0"
       }
     >
-      <div className="rendered-output-tabs mb-3 grid grid-cols-3 rounded-xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
+      <div className="rendered-output-tabs relative z-20 mb-3 grid shrink-0 grid-cols-3 rounded-xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
         {(["preview", "html", "css"] as const).map((value) => (
           <button
             key={value}
             type="button"
+            aria-pressed={tab === value}
             onClick={() => setTab(value)}
             className={`rendered-output-tab min-w-0 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide transition ${
               tab === value
@@ -237,7 +274,7 @@ export function RenderedBubbleInspector() {
       )}
 
       {showingCode && (
-        <div className="min-h-0 flex-1">
+        <div className="relative z-10 min-h-0 flex-1 overflow-hidden rounded-2xl">
           {tab === "html" ? (
             <HtmlOutputTab output={output} />
           ) : (

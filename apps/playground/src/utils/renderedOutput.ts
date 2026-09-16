@@ -3,6 +3,16 @@ export type RenderedOutput = {
   css: string;
 };
 
+export const renderedOutputEventName = "pointer-bubble:rendered-output";
+
+export function publishRenderedOutput(output: RenderedOutput | null) {
+  window.dispatchEvent(
+    new CustomEvent<RenderedOutput | null>(renderedOutputEventName, {
+      detail: output,
+    }),
+  );
+}
+
 const semanticSelectors = [
   ".pointer-bubble",
   ".pointer-bubble > .pb-pulse",

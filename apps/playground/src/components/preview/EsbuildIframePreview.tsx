@@ -23,6 +23,7 @@ import { createRoot } from "react-dom/client";
 import * as maplibregl from "../maplibre";
 import {
   createRenderedOutput,
+  publishRenderedOutput,
   type RenderedOutput,
 } from "@/utils/renderedOutput";
 import {
@@ -89,6 +90,7 @@ export function EsbuildIframePreview({
     useState<PreviewErrorCategory>("Preview error");
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const previewTimeoutRef = useRef<number | null>(null);
+  const renderedOutputTimeoutsRef = useRef<number[]>([]);
   const requestIdRef = useRef(0);
   const activeRequestIdRef = useRef(0);
   const iframeHtml = useMemo(() => createIsolatedPreviewHtml(), []);
@@ -104,6 +106,46 @@ export function EsbuildIframePreview({
     return true;
   }
 
+  function clearRenderedOutputTimeouts() {
+    renderedOutputTimeoutsRef.current.forEach((timeout) =>
+      window.clearTimeout(timeout),
+    );
+    renderedOutputTimeoutsRef.current = [];
+  }
+
+  function captureRenderedOutput(requestId = activeRequestIdRef.current) {
+    if (requestId !== activeRequestIdRef.current) return;
+
+    const document = iframeRef.current?.contentDocument;
+    const output = document ? createRenderedOutput(document) : null;
+    if (!output) return;
+
+    onRenderedOutput?.(output);
+    publishRenderedOutput(output);
+  }
+
+  function captureRenderedOutputAfterRender(requestId: number) {
+    clearRenderedOutputTimeouts();
+
+    // React commits and Tailwind Play's generated stylesheet can settle on
+    // different turns. Capture immediately, after paint, and again after the
+    // utility stylesheet has had a chance to refresh. Each capture replaces
+    // the CSS tab with the latest computed styles for this editor revision.
+    captureRenderedOutput(requestId);
+
+    window.requestAnimationFrame(() => {
+      if (requestId !== activeRequestIdRef.current) return;
+      captureRenderedOutput(requestId);
+      window.requestAnimationFrame(() => captureRenderedOutput(requestId));
+    });
+
+    for (const delay of [75, 200]) {
+      renderedOutputTimeoutsRef.current.push(
+        window.setTimeout(() => captureRenderedOutput(requestId), delay),
+      );
+    }
+  }
+
   useEffect(() => {
     function handlePreviewMessage(event: MessageEvent) {
       if (event.source !== iframeRef.current?.contentWindow || !event.data) return;
@@ -117,10 +159,7 @@ export function EsbuildIframePreview({
         setStatus("ready");
         setErrorMessage("");
         setErrorCategory("Preview error");
-        window.requestAnimationFrame(() => {
-          const document = iframeRef.current?.contentDocument;
-          onRenderedOutput?.(document ? createRenderedOutput(document) : null);
-        });
+        captureRenderedOutputAfterRender(event.data.requestId);
       }
 
       if (event.data.type === "POINTER_BUBBLE_PREVIEW_ERROR") {
@@ -136,7 +175,26 @@ export function EsbuildIframePreview({
 
     window.addEventListener("message", handlePreviewMessage);
     return () => window.removeEventListener("message", handlePreviewMessage);
-  }, [onRenderedOutput]);
+  });
+
+  useEffect(() => {
+    const iframeDocument = iframeRef.current?.contentDocument;
+    if (!iframeLoaded || !iframeDocument?.documentElement) return undefined;
+
+    const observer = new MutationObserver(() => {
+      const requestId = activeRequestIdRef.current;
+      window.requestAnimationFrame(() => captureRenderedOutput(requestId));
+    });
+
+    observer.observe(iframeDocument.documentElement, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => observer.disconnect();
+  }, [iframeLoaded]);
 
   useEffect(() => {
     let cancelled = false;
@@ -145,8 +203,6 @@ export function EsbuildIframePreview({
       const previewWindow = iframeRef.current?.contentWindow;
       if (!iframeLoaded || !previewWindow) return;
 
-      // Keep the runtime module map synchronized before every compile/run. This
-      // makes editor updates deterministic even if the iframe was just mounted.
       if (!installPreviewHostModules()) return;
 
       const runKeyChanged = lastRunKeyRef.current !== runKey;
@@ -160,6 +216,7 @@ export function EsbuildIframePreview({
       hasRunOnceRef.current = true;
       const requestId = ++requestIdRef.current;
       activeRequestIdRef.current = requestId;
+      clearRenderedOutputTimeouts();
 
       try {
         setStatus("loading");
@@ -221,6 +278,7 @@ export function EsbuildIframePreview({
       if (previewTimeoutRef.current) {
         window.clearTimeout(previewTimeoutRef.current);
       }
+      clearRenderedOutputTimeouts();
     };
   }, []);
 
