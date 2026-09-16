@@ -2,6 +2,9 @@ import { useRef } from "react";
 import Editor from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { Undo2, Redo2, Check, Copy } from "lucide-react";
+
+const playgroundModuleDiagnosticCodes = [2307, 2792, 7016];
+
 export function MonacoCodePanel({
   code,
   readOnly = true,
@@ -54,7 +57,7 @@ export function MonacoCodePanel({
     fontSize: 13,
     lineNumbersMinChars: 3,
     scrollBeyondLastLine: false,
-    fixedOverflowWidgets: true,
+    fixedOverflowWidgets: false,
     wordWrap: "on" as const,
     padding: { top: 14, bottom: 14 },
     overviewRulerBorder: false,
@@ -64,7 +67,7 @@ export function MonacoCodePanel({
   };
 
   return (
-    <div className="playground-code-panel relative z-10 flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-[#0f172a] p-1.5 shadow-2xl">
+    <div className="playground-code-panel relative z-10 flex h-full min-h-0 flex-col overflow-visible rounded-2xl border border-slate-800 bg-[#0f172a] p-1.5 shadow-2xl">
       <div className="playground-code-panel__toolbar flex items-center justify-between gap-3 rounded-t-xl border-b border-white/10 bg-slate-950 px-4 py-2">
         <div className="playground-code-panel__meta flex min-w-0 items-center gap-2">
           <span className="min-w-0 truncate text-xs font-semibold text-slate-300">
@@ -118,12 +121,34 @@ export function MonacoCodePanel({
           )}
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded-b-xl">
+      <div className="playground-code-panel__editor min-h-0 flex-1 overflow-visible rounded-b-xl">
         <Editor
           height="100%"
+          path={filename}
           language={language}
           value={code}
           onChange={(value) => onChange?.(value ?? "")}
+          beforeMount={(monaco) => {
+            const typescript = monaco.languages.typescript;
+            const configure = (
+              defaults: typeof typescript.typescriptDefaults,
+            ) => {
+              defaults.setCompilerOptions({
+                ...defaults.getCompilerOptions(),
+                allowUnreachableCode: true,
+                allowNonTsExtensions: true,
+                jsx: typescript.JsxEmit.ReactJSX,
+                module: typescript.ModuleKind.ESNext,
+                target: typescript.ScriptTarget.ES2020,
+              });
+              defaults.setDiagnosticsOptions({
+                diagnosticCodesToIgnore: playgroundModuleDiagnosticCodes,
+              });
+            };
+
+            configure(typescript.typescriptDefaults);
+            configure(typescript.javascriptDefaults);
+          }}
           onMount={(mountedEditor) => {
             editorRef.current = mountedEditor;
           }}

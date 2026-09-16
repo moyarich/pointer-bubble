@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { MonacoCodePanel } from "../editor/MonacoCodePanel";
 import {
   createRenderedOutput,
   type RenderedOutput,
 } from "@/utils/renderedOutput";
+import { CssOutputTab } from "./tabs/CssOutputTab";
+import { HtmlOutputTab } from "./tabs/HtmlOutputTab";
+import { PreviewOutputTab } from "./tabs/PreviewOutputTab";
 
 const drawerSelector = 'aside[role="dialog"]';
 const inspectorAttribute = "data-rendered-output-inspector";
@@ -78,13 +80,6 @@ export function RenderedBubbleInspector() {
   const [host, setHost] = useState<HTMLElement | null>(null);
   const [output, setOutput] = useState<RenderedOutput | null>(null);
   const [tab, setTab] = useState<OutputTab>("preview");
-  const [copied, setCopied] = useState(false);
-
-  const code = useMemo(() => {
-    if (tab === "html") return output?.html ?? "";
-    if (tab === "css") return output?.css ?? "";
-    return "";
-  }, [output, tab]);
 
   useEffect(() => {
     let previewObserver: MutationObserver | null = null;
@@ -207,17 +202,6 @@ export function RenderedBubbleInspector() {
     };
   }, [host, tab]);
 
-  async function copyCode() {
-    if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1200);
-    } catch {
-      setCopied(false);
-    }
-  }
-
   if (!host) return null;
 
   const showingCode = tab !== "preview";
@@ -248,23 +232,16 @@ export function RenderedBubbleInspector() {
         ))}
       </div>
 
+      {tab === "preview" && (
+        <PreviewOutputTab host={host} refreshKey={output} />
+      )}
+
       {showingCode && (
         <div className="min-h-0 flex-1">
-          {output ? (
-            <MonacoCodePanel
-              code={code}
-              readOnly
-              language={tab}
-              filename={
-                tab === "html" ? "pointer-bubble.html" : "pointer-bubble.css"
-              }
-              onCopy={copyCode}
-              copied={copied}
-            />
+          {tab === "html" ? (
+            <HtmlOutputTab output={output} />
           ) : (
-            <div className="flex h-full min-h-[220px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-950 px-6 text-center text-xs text-slate-400">
-              Run the preview to inspect the rendered PointerBubble output.
-            </div>
+            <CssOutputTab output={output} />
           )}
         </div>
       )}
