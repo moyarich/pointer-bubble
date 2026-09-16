@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 
 import {
   createRenderedOutput,
+  renderedOutputEventName,
   type RenderedOutput,
 } from "@/utils/renderedOutput";
 import { CssOutputTab } from "./tabs/CssOutputTab";
@@ -51,10 +52,6 @@ function readRenderedOutput(host: HTMLElement): RenderedOutput | null {
 
 function setPreviewVisibility(host: HTMLElement, visible: boolean) {
   for (const child of findPreviewChildren(host)) {
-    // Use an inline display value instead of the hidden attribute. Several
-    // preview children carry display utility classes (for example `flex`),
-    // which can otherwise win the cascade and leave the live preview painted
-    // over the HTML/CSS editor.
     child.style.display = visible ? "" : "none";
   }
 }
@@ -95,6 +92,10 @@ export function RenderedBubbleInspector() {
     let observedIframe: HTMLIFrameElement | null = null;
     let iframeLoadHandler: (() => void) | null = null;
 
+    function updateOutput(nextOutput: RenderedOutput | null) {
+      if (nextOutput) setOutput(nextOutput);
+    }
+
     function disconnectIframeObserver() {
       iframeObserver?.disconnect();
       iframeObserver = null;
@@ -115,7 +116,11 @@ export function RenderedBubbleInspector() {
 
     function capture(nextHost: HTMLElement | null) {
       setHost(nextHost);
-      setOutput(nextHost ? readRenderedOutput(nextHost) : null);
+      if (!nextHost) {
+        setOutput(null);
+        return;
+      }
+      updateOutput(readRenderedOutput(nextHost));
     }
 
     function observeIframe(nextHost: HTMLElement) {
@@ -128,13 +133,13 @@ export function RenderedBubbleInspector() {
       observedIframe = iframe;
 
       const captureIframe = () => {
-        setOutput(readRenderedOutput(nextHost));
+        updateOutput(readRenderedOutput(nextHost));
         const iframeDocument = iframe.contentDocument;
         if (!iframeDocument?.body) return;
 
         iframeObserver?.disconnect();
         iframeObserver = new MutationObserver(() => {
-          setOutput(readRenderedOutput(nextHost));
+          updateOutput(readRenderedOutput(nextHost));
         });
         iframeObserver.observe(iframeDocument.body, {
           attributes: true,
@@ -160,7 +165,7 @@ export function RenderedBubbleInspector() {
       const previewRoot = findPreviewRoot(nextHost);
       if (previewRoot) {
         previewObserver = new MutationObserver(() => {
-          setOutput(readRenderedOutput(nextHost));
+          updateOutput(readRenderedOutput(nextHost));
           observeIframe(nextHost);
         });
         previewObserver.observe(previewRoot, {
@@ -186,15 +191,22 @@ export function RenderedBubbleInspector() {
       observeIframe(nextHost);
     }
 
+    function handlePublishedOutput(event: Event) {
+      const customEvent = event as CustomEvent<RenderedOutput | null>;
+      updateOutput(customEvent.detail);
+    }
+
     const drawerObserver = new MutationObserver(() => {
       const nextHost = findDrawerOutputHost();
       if (nextHost !== observedHost) observePreview(nextHost);
     });
 
+    window.addEventListener(renderedOutputEventName, handlePublishedOutput);
     drawerObserver.observe(document.body, { childList: true, subtree: true });
     observePreview(findDrawerOutputHost());
 
     return () => {
+      window.removeEventListener(renderedOutputEventName, handlePublishedOutput);
       drawerObserver.disconnect();
       disconnectPreviewObservers();
     };
