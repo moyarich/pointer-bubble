@@ -14,7 +14,7 @@
     "build:playground": "npm run build --workspace @moyarich/pointer-bubble-playground",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspace @moyarich/pointer-bubble && node --test apps/playground/tests/*.test.mjs",
-    "test:playground-browser": "node apps/playground/tests/live-css-edit.browser.mjs",
+    "test:playground-browser": "node apps/playground/tests/live-css-edit.browser.mjs && node apps/playground/tests/rendered-output-codepen.browser.mjs",
     "pack:lib": "npm pack --workspace @moyarich/pointer-bubble --dry-run",
     "release:check": "node scripts/publish.mjs --dry-run",
     "publish:first": "node scripts/publish.mjs --publish-first",
