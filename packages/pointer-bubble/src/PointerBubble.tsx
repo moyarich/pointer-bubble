@@ -60,17 +60,17 @@ export function PointerBubble({
   style,
   ...rootProps
 }: PointerBubbleProps) {
-  const markerStyle = {
-    "--marker-bg": backgroundColor,
-    "--marker-border": borderColor,
-    "--marker-text": textColor,
-    "--marker-ring": selectedRingColor,
-    "--marker-pulse": pulseColor ?? backgroundColor,
-    "--marker-shadow": shadowColor,
-    "--marker-content-bg": showContentBackground
+  const bubbleStyle = {
+    "--pb-background-color": backgroundColor,
+    "--pb-border-color": borderColor,
+    "--pb-text-color": textColor,
+    "--pb-selected-ring-color": selectedRingColor,
+    "--pb-pulse-color": pulseColor ?? backgroundColor,
+    "--pb-shadow-color": shadowColor,
+    "--pb-content-background-color": showContentBackground
       ? contentBackgroundColor
       : "transparent",
-    "--marker-content-border": showContentBorder
+    "--pb-content-border-color": showContentBorder
       ? contentBorderColor
       : "transparent",
   } as CSSProperties;
@@ -81,7 +81,7 @@ export function PointerBubble({
       className={cn("pointer-bubble", rootClass)}
       data-size={size}
       data-selected={selected || undefined}
-      style={{ ...markerStyle, ...style }}
+      style={{ ...bubbleStyle, ...style }}
     >
       {selected && showPulse && (
         <span aria-hidden="true" className={cn("pb-pulse", pulseClass)} />
