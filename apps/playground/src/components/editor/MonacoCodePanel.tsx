@@ -65,7 +65,7 @@ export function MonacoCodePanel({
   };
 
   return (
-    <div className="playground-code-panel relative z-10 flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-[#0f172a] p-1.5 shadow-2xl">
+    <div className="playground-code-panel relative z-10 flex h-full min-h-0 flex-col overflow-visible rounded-2xl border border-slate-800 bg-[#0f172a] p-1.5 shadow-2xl">
       <div className="playground-code-panel__toolbar flex items-center justify-between gap-3 rounded-t-xl border-b border-white/10 bg-slate-950 px-4 py-2">
         <div className="playground-code-panel__meta flex min-w-0 items-center gap-2">
           <span className="min-w-0 truncate text-xs font-semibold text-slate-300">
@@ -119,7 +119,7 @@ export function MonacoCodePanel({
           )}
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded-b-xl">
+      <div className="playground-code-panel__editor min-h-0 flex-1 overflow-visible rounded-b-xl">
         <Editor
           height="100%"
           language={language}
