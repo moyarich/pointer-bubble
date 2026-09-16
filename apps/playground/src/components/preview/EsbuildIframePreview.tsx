@@ -23,6 +23,7 @@ import { createRoot } from "react-dom/client";
 import * as maplibregl from "../maplibre";
 import {
   createRenderedOutput,
+  publishRenderedOutput,
   type RenderedOutput,
 } from "@/utils/renderedOutput";
 import {
@@ -119,7 +120,9 @@ export function EsbuildIframePreview({
         setErrorCategory("Preview error");
         window.requestAnimationFrame(() => {
           const document = iframeRef.current?.contentDocument;
-          onRenderedOutput?.(document ? createRenderedOutput(document) : null);
+          const output = document ? createRenderedOutput(document) : null;
+          onRenderedOutput?.(output);
+          publishRenderedOutput(output);
         });
       }
 
@@ -145,8 +148,6 @@ export function EsbuildIframePreview({
       const previewWindow = iframeRef.current?.contentWindow;
       if (!iframeLoaded || !previewWindow) return;
 
-      // Keep the runtime module map synchronized before every compile/run. This
-      // makes editor updates deterministic even if the iframe was just mounted.
       if (!installPreviewHostModules()) return;
 
       const runKeyChanged = lastRunKeyRef.current !== runKey;
