@@ -1,6 +1,6 @@
 {
   "name": "@moyarich/pointer-bubble",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Customizable React pointer bubbles for map markers, labels, and callouts.",
   "author": "Moya Richards",
   "license": "MIT",
