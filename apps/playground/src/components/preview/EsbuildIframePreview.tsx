@@ -231,7 +231,7 @@ export function EsbuildIframePreview({
         title="Isolated TSX preview"
         sandbox="allow-scripts allow-same-origin"
         srcDoc={iframeHtml}
-        className="h-full min-h-[220px] w-full bg-slate-50"
+        className="h-full min-h-[220px] w-full bg-transparent"
         onLoad={() => {
           installPreviewHostModules();
           setIframeLoaded(true);
