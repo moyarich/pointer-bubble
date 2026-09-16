@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { PointerBubble } from "@moyarich/pointer-bubble";
+import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 
 import * as maplibregl from "../maplibre";
@@ -38,7 +39,7 @@ import {
 function createPreviewHostModules() {
   return {
     react: React,
-    "react-dom": { createRoot },
+    "react-dom": { flushSync },
     "react-dom/client": { createRoot },
     "maplibre-gl": maplibregl,
     "lucide-react": {
@@ -127,10 +128,6 @@ export function EsbuildIframePreview({
   function captureRenderedOutputAfterRender(requestId: number) {
     clearRenderedOutputTimeouts();
 
-    // React commits and Tailwind Play's generated stylesheet can settle on
-    // different turns. Capture immediately, after paint, and again after the
-    // utility stylesheet has had a chance to refresh. Each capture replaces
-    // the CSS tab with the latest computed styles for this editor revision.
     captureRenderedOutput(requestId);
 
     window.requestAnimationFrame(() => {
@@ -185,8 +182,6 @@ export function EsbuildIframePreview({
     const observer = new MutationObserver(() => {
       const requestId = activeRequestIdRef.current;
       window.clearTimeout(captureTimer);
-      // Tailwind can update its stylesheet after React commits. Capture those
-      // changes even while the preview is hidden behind the HTML/CSS tabs.
       captureTimer = window.setTimeout(() => captureRenderedOutput(requestId), 0);
     });
 
