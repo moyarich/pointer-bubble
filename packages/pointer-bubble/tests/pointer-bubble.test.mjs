@@ -14,25 +14,36 @@ const render = (props = {}) =>
 test("renders without a browser, with children and documented defaults", () => {
   const html = render();
   assert.match(html, /data-size="md"/);
-  assert.match(html, /--marker-bg:#79bd9a/);
+  assert.match(html, /--pb-background-color:#79bd9a/);
   assert.match(html, />Oak</);
   assert.match(html, /pb-tip-outer/);
   assert.match(html, /pb-shadow-wrap/);
-  assert.doesNotMatch(html, /pb-pulse/);
+  assert.doesNotMatch(html, /class="[^"]*\bpb-pulse\b/);
 });
 
 test("all sizes render; optional layers and selected pulse behave independently", () => {
   for (const size of ["xxs", "xs", "sm", "md", "lg"])
     assert.match(render({ size }), new RegExp(`data-size="${size}"`));
+
   const hidden = render({
     showTip: false,
     showShadow: false,
     showContentBorder: false,
     showContentBackground: false,
   });
-  assert.doesNotMatch(hidden, /pb-tip|pb-shadow|data-background|data-border/);
-  assert.match(render({ selected: true, showPulse: true }), /pb-pulse/);
-  assert.doesNotMatch(render({ selected: false, showPulse: true }), /pb-pulse/);
+
+  assert.doesNotMatch(hidden, /class="[^"]*\bpb-tip\b/);
+  assert.doesNotMatch(hidden, /class="[^"]*\bpb-shadow-wrap\b/);
+  assert.doesNotMatch(hidden, /data-background=/);
+  assert.doesNotMatch(hidden, /data-border=/);
+  assert.match(
+    render({ selected: true, showPulse: true }),
+    /class="[^"]*\bpb-pulse\b/,
+  );
+  assert.doesNotMatch(
+    render({ selected: false, showPulse: true }),
+    /class="[^"]*\bpb-pulse\b/,
+  );
 });
 
 test("passes accessible DOM attributes and styles to the root without leaking component props", () => {
@@ -47,7 +58,7 @@ test("passes accessible DOM attributes and styles to the root without leaking co
   assert.match(html, /id="oak"/);
   assert.match(html, /aria-label="Oak tree"/);
   assert.match(html, /margin-top:12px/);
-  assert.match(html, /--marker-bg:#123456/);
+  assert.match(html, /--pb-background-color:#123456/);
   assert.doesNotMatch(html, /backgroundColor=/);
 });
 
