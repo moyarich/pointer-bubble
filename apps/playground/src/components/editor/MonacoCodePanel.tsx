@@ -2,6 +2,7 @@ import { useRef } from "react";
 import Editor from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import { Undo2, Redo2, Check, Copy } from "lucide-react";
+
 export function MonacoCodePanel({
   code,
   readOnly = true,
@@ -124,6 +125,20 @@ export function MonacoCodePanel({
           language={language}
           value={code}
           onChange={(value) => onChange?.(value ?? "")}
+          beforeMount={(monaco) => {
+            const typescript = monaco.languages.typescript;
+            const configure = (
+              defaults: typeof typescript.typescriptDefaults,
+            ) => {
+              defaults.setCompilerOptions({
+                ...defaults.getCompilerOptions(),
+                allowUnreachableCode: true,
+              });
+            };
+
+            configure(typescript.typescriptDefaults);
+            configure(typescript.javascriptDefaults);
+          }}
           onMount={(mountedEditor) => {
             editorRef.current = mountedEditor;
           }}
