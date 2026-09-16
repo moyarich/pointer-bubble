@@ -128,10 +128,10 @@
     min-height: var(--pb-bubble);
     min-width: var(--pb-bubble);
     padding: var(--pb-py) var(--pb-px);
-    border: var(--pb-border) solid var(--marker-border);
+    border: var(--pb-border) solid var(--pb-border-color);
     border-radius: 9999px;
-    background: var(--marker-bg);
-    color: var(--marker-text);
+    background: var(--pb-bg);
+    color: var(--pb-text-color);
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
     font-size: var(--pb-font);
     font-weight: 700;
@@ -145,7 +145,7 @@
     translate: 0 -0.25rem;
     scale: 1.05;
     box-shadow:
-      0 0 0 4px var(--marker-ring),
+      0 0 0 4px var(--pb-ring-color),
       0 14px 28px rgba(0, 0, 0, 0.28);
   }
 
@@ -177,7 +177,7 @@
     z-index: 0;
     border-left: var(--pb-tip-outer-left) solid transparent;
     border-right: var(--pb-tip-outer-right) solid transparent;
-    border-top: var(--pb-tip-outer-top) solid var(--marker-border);
+    border-top: var(--pb-tip-outer-top) solid var(--pb-border-color);
   }
 
   :where(.pointer-bubble .pb-tip-inner) {
@@ -186,7 +186,7 @@
     margin-top: calc(-1 * var(--pb-tip-inner-offset));
     border-left: var(--pb-tip-inner-left) solid transparent;
     border-right: var(--pb-tip-inner-right) solid transparent;
-    border-top: var(--pb-tip-inner-top) solid var(--marker-bg);
+    border-top: var(--pb-tip-inner-top) solid var(--pb-bg);
   }
 
   :where(.pointer-bubble .pb-content) {
@@ -197,9 +197,9 @@
     min-height: var(--pb-content);
     min-width: var(--pb-content);
     padding-inline: var(--pb-content-px);
-    border: 0 solid var(--marker-content-border);
+    border: 0 solid var(--pb-content-border-color);
     border-radius: 9999px;
-    background: var(--marker-content-bg);
+    background: var(--pb-content-bg);
     text-align: center;
     white-space: normal;
     overflow-wrap: break-word;
@@ -228,7 +228,7 @@
     margin-top: var(--pb-shadow-mt);
     translate: -50% 0;
     border-radius: 9999px;
-    background: var(--marker-shadow);
+    background: var(--pb-shadow-color);
     filter: blur(2px);
   }
 
@@ -241,7 +241,7 @@
     height: var(--pb-pulse);
     translate: -50% -50%;
     border-radius: 9999px;
-    background: var(--marker-pulse);
+    background: var(--pb-pulse-color);
     opacity: 0.2;
     animation: pointer-bubble-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
     pointer-events: none;
