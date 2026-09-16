@@ -82,31 +82,19 @@
 
   .playground-preview-actions {
     justify-content: flex-end;
-    width: 100%;
+    font-size: 0.75rem;
   }
 
   .rendered-output-tab {
     padding: 0.4rem 0.25rem;
-    font-size: 0.625rem;
+    gap: 0.125rem;
+    font-size: 0.75rem;
     letter-spacing: 0.025em;
   }
 }
 
 @container (max-width: 250px) {
-  .playground-preview-actions {
-    gap: 0.25rem !important;
-  }
-
   .playground-preview-actions button:not([aria-label]) {
     padding-inline: 0.5rem;
-  }
-
-  .rendered-output-tabs {
-    gap: 0.125rem;
-  }
-
-  .rendered-output-tab {
-    padding-inline: 0.125rem;
-    font-size: 0.5625rem;
   }
 }
