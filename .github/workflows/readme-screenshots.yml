@@ -18,7 +18,7 @@ jobs:
           node-version: 24
           cache: npm
       - name: Install dependencies
-        run: npm install
+        run: npm ci --include=optional
       - name: Install Playwright
         run: |
           npm install --no-save --package-lock=false playwright@1.55.0
