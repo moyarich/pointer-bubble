@@ -56,6 +56,8 @@ export function EsbuildIframePreview({
     useState<PreviewErrorCategory>("Preview error");
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const previewTimeoutRef = useRef<number | null>(null);
+  const requestIdRef = useRef(0);
+  const activeRequestIdRef = useRef(0);
   const iframeHtml = useMemo(() => createIsolatedPreviewHtml(), []);
   const previewHostModules = useMemo(() => createPreviewHostModules(), []);
   const lastRunKeyRef = useRef(runKey);
@@ -64,6 +66,8 @@ export function EsbuildIframePreview({
   useEffect(() => {
     function handlePreviewMessage(event: MessageEvent) {
       if (event.source !== iframeRef.current?.contentWindow || !event.data) return;
+      if (event.data.requestId !== activeRequestIdRef.current) return;
+
       if (event.data.type === "POINTER_BUBBLE_PREVIEW_READY") {
         if (previewTimeoutRef.current) {
           window.clearTimeout(previewTimeoutRef.current);
@@ -85,7 +89,6 @@ export function EsbuildIframePreview({
         setStatus("error");
         setErrorMessage(event.data.message || "Preview failed.");
         setErrorCategory(event.data.category || "Runtime error");
-        onRenderedOutput?.(null);
       }
     }
 
@@ -108,11 +111,13 @@ export function EsbuildIframePreview({
 
       lastRunKeyRef.current = runKey;
       hasRunOnceRef.current = true;
+      const requestId = ++requestIdRef.current;
+      activeRequestIdRef.current = requestId;
+
       try {
         setStatus("loading");
         setErrorMessage("");
         setErrorCategory("Preview error");
-        onRenderedOutput?.(null);
 
         const esbuild = await initializeSharedEsbuild();
         const result = (await esbuild.transform(
@@ -127,38 +132,42 @@ export function EsbuildIframePreview({
           },
         )) as EsbuildTransformResult;
 
-        if (cancelled) return;
+        if (cancelled || requestId !== activeRequestIdRef.current) return;
+
+        if (previewTimeoutRef.current) {
+          window.clearTimeout(previewTimeoutRef.current);
+        }
         previewTimeoutRef.current = window.setTimeout(() => {
+          if (requestId !== activeRequestIdRef.current) return;
           setStatus("error");
           setErrorCategory("Iframe error");
           setErrorMessage(
             "The iframe preview did not respond. A runtime import may have failed to load.",
           );
-          onRenderedOutput?.(null);
         }, 4000);
+
         iframeRef.current?.contentWindow?.postMessage(
-          { type: "POINTER_BUBBLE_RUN_PREVIEW", compiledCode: result.code },
+          {
+            type: "POINTER_BUBBLE_RUN_PREVIEW",
+            requestId,
+            compiledCode: result.code,
+          },
           "*",
         );
       } catch (error) {
-        if (cancelled) return;
+        if (cancelled || requestId !== activeRequestIdRef.current) return;
         setStatus("error");
         setErrorMessage(error instanceof Error ? error.message : String(error));
         setErrorCategory(getPreviewErrorCategory(error));
-        onRenderedOutput?.(null);
       }
     }
 
-    const timer = window.setTimeout(compileAndRun, 250);
+    const timer = window.setTimeout(compileAndRun, 300);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
-      if (previewTimeoutRef.current) {
-        window.clearTimeout(previewTimeoutRef.current);
-        previewTimeoutRef.current = null;
-      }
     };
-  }, [code, iframeLoaded, runKey, autoRunPreview, onRenderedOutput]);
+  }, [code, iframeLoaded, runKey, autoRunPreview]);
 
   useEffect(() => {
     const previewWindow = iframeRef.current?.contentWindow as
@@ -171,6 +180,14 @@ export function EsbuildIframePreview({
 
     previewWindow.__PREVIEW_HOST_MODULES__ = previewHostModules;
   }, [iframeLoaded, previewHostModules]);
+
+  useEffect(() => {
+    return () => {
+      if (previewTimeoutRef.current) {
+        window.clearTimeout(previewTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="relative h-full min-h-[220px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
@@ -190,7 +207,7 @@ export function EsbuildIframePreview({
             : errorCategory}
       </div>
       {status === "error" && errorMessage && (
-        <div className="absolute inset-x-3 bottom-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs text-red-700 shadow-sm">
+        <div className="absolute inset-x-3 bottom-3 rounded-2xl border border-red-200 bg-red-50/95 p-3 text-xs text-red-700 shadow-sm backdrop-blur">
           <div className="mb-1 font-bold uppercase tracking-wide">
             {errorCategory}
           </div>
