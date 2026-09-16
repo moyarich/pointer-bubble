@@ -233,9 +233,22 @@ export function createIsolatedPreviewHtml() {
     <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.9.0/dist/maplibre-gl.css" rel="stylesheet" />
     <style>${pointerBubbleStyles}</style>
     <style>
-      html, body, #root { width: 100%; height: 100%; margin: 0; }
-      body { background: #f8fafc; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-      #root { display: grid; place-items: center; min-height: 100%; padding: 2rem; box-sizing: border-box; }
+      html, body, #root {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background: transparent;
+      }
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      }
+      #root {
+        display: grid;
+        place-items: center;
+        min-height: 100%;
+        padding: 2rem;
+        box-sizing: border-box;
+      }
     </style>
   </head>
   <body>
