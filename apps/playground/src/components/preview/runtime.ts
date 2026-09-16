@@ -230,6 +230,17 @@ export function createIsolatedPreviewHtml() {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // The Play CDN's preflight reset is emitted outside the package's CSS
+      // layers, so it can override PointerBubble structural borders. Keep
+      // utilities available for demo classNames while leaving component
+      // defaults intact.
+      tailwind.config = {
+        corePlugins: {
+          preflight: false,
+        },
+      };
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.9.0/dist/maplibre-gl.css" rel="stylesheet" />
     <style>${pointerBubbleStyles}</style>
     <style>
@@ -296,9 +307,6 @@ export function createIsolatedPreviewHtml() {
           );
           if (typeof Demo !== 'function') throw new Error('The preview code must export a Demo component.');
 
-          // Keep one React root for the lifetime of the iframe. Re-rendering the
-          // new Demo into the same root makes prop-only editor changes update
-          // immediately instead of tearing down the preview between runs.
           root ??= createRoot(rootElement);
           root.render(React.createElement(Demo));
 
