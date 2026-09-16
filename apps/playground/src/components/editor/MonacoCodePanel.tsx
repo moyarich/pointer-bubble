@@ -124,6 +124,7 @@ export function MonacoCodePanel({
       <div className="playground-code-panel__editor min-h-0 flex-1 overflow-visible rounded-b-xl">
         <Editor
           height="100%"
+          path={filename}
           language={language}
           value={code}
           onChange={(value) => onChange?.(value ?? "")}
@@ -135,6 +136,10 @@ export function MonacoCodePanel({
               defaults.setCompilerOptions({
                 ...defaults.getCompilerOptions(),
                 allowUnreachableCode: true,
+                allowNonTsExtensions: true,
+                jsx: typescript.JsxEmit.ReactJSX,
+                module: typescript.ModuleKind.ESNext,
+                target: typescript.ScriptTarget.ES2020,
               });
               defaults.setDiagnosticsOptions({
                 diagnosticCodesToIgnore: playgroundModuleDiagnosticCodes,
