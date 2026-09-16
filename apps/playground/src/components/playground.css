@@ -1,14 +1,112 @@
 .monaco-hover,
-        .monaco-hover-content,
-        .monaco-editor-hover,
-        .monaco-editor .suggest-widget,
-        .monaco-editor .parameter-hints-widget,
-        .monaco-editor .context-view,
-        .monaco-editor .monaco-list {
-          z-index: 999999 !important;
-        }
-        .monaco-editor,
-        .monaco-editor-background,
-        .monaco-editor .inputarea.ime-input {
-          overflow: visible !important;
-        }
+.monaco-hover-content,
+.monaco-editor-hover,
+.monaco-editor .suggest-widget,
+.monaco-editor .parameter-hints-widget,
+.monaco-editor .context-view,
+.monaco-editor .monaco-list {
+  z-index: 999999 !important;
+}
+
+.monaco-editor,
+.monaco-editor-background,
+.monaco-editor .inputarea.ime-input {
+  overflow: visible !important;
+}
+
+.playground-code-panel,
+.playground-preview-host,
+.rendered-output-inspector {
+  container-type: inline-size;
+}
+
+.playground-code-panel__toolbar,
+.playground-code-panel__actions,
+.playground-preview-toolbar,
+.playground-preview-actions {
+  min-width: 0;
+}
+
+.playground-preview-toolbar,
+.playground-preview-actions {
+  flex-wrap: wrap;
+}
+
+.rendered-output-tab {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container (max-width: 430px) {
+  .playground-code-panel__toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .playground-code-panel__meta {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .playground-code-panel__actions {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+@container (max-width: 320px) {
+  .playground-code-panel__toolbar {
+    padding-inline: 0.5rem;
+  }
+
+  .playground-code-panel__actions {
+    gap: 0.375rem;
+  }
+
+  .playground-code-panel__actions button {
+    padding-inline: 0.45rem;
+  }
+
+  .playground-code-panel__action-label {
+    display: none;
+  }
+
+  .playground-preview-toolbar {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+
+  .playground-preview-actions {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .rendered-output-tab {
+    padding: 0.4rem 0.25rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.025em;
+  }
+}
+
+@container (max-width: 250px) {
+  .playground-preview-actions {
+    gap: 0.25rem !important;
+  }
+
+  .playground-preview-actions button:not([aria-label]) {
+    padding-inline: 0.5rem;
+  }
+
+  .rendered-output-tabs {
+    gap: 0.125rem;
+  }
+
+  .rendered-output-tab {
+    padding-inline: 0.125rem;
+    font-size: 0.5625rem;
+  }
+}
