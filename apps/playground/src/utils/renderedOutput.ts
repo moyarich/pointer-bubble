@@ -44,6 +44,143 @@ const pointerBubbleVariables = [
   "--pb-tip-inner-offset-y",
 ] as const;
 
+// Keep the export self-contained without dumping the playground's entire
+// computed-style environment (Tailwind theme variables, Monaco variables,
+// browser-only defaults, etc.). These are the visual/layout properties needed
+// to reproduce PointerBubble and consumer content in a blank document.
+const portableProperties = [
+  "position",
+  "inset",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "z-index",
+  "display",
+  "box-sizing",
+  "width",
+  "min-width",
+  "max-width",
+  "height",
+  "min-height",
+  "max-height",
+  "aspect-ratio",
+  "margin",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "padding",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "gap",
+  "row-gap",
+  "column-gap",
+  "flex",
+  "flex-basis",
+  "flex-direction",
+  "flex-grow",
+  "flex-shrink",
+  "flex-wrap",
+  "align-content",
+  "align-items",
+  "align-self",
+  "justify-content",
+  "justify-items",
+  "justify-self",
+  "place-content",
+  "place-items",
+  "place-self",
+  "grid-auto-columns",
+  "grid-auto-flow",
+  "grid-auto-rows",
+  "grid-column",
+  "grid-row",
+  "grid-template-columns",
+  "grid-template-rows",
+  "overflow",
+  "overflow-x",
+  "overflow-y",
+  "overflow-wrap",
+  "white-space",
+  "border",
+  "border-width",
+  "border-style",
+  "border-color",
+  "border-top-width",
+  "border-right-width",
+  "border-bottom-width",
+  "border-left-width",
+  "border-top-style",
+  "border-right-style",
+  "border-bottom-style",
+  "border-left-style",
+  "border-top-color",
+  "border-right-color",
+  "border-bottom-color",
+  "border-left-color",
+  "border-radius",
+  "border-top-left-radius",
+  "border-top-right-radius",
+  "border-bottom-right-radius",
+  "border-bottom-left-radius",
+  "background",
+  "background-color",
+  "background-image",
+  "background-position",
+  "background-repeat",
+  "background-size",
+  "box-shadow",
+  "color",
+  "opacity",
+  "font-family",
+  "font-size",
+  "font-style",
+  "font-weight",
+  "line-height",
+  "letter-spacing",
+  "text-align",
+  "text-decoration",
+  "text-transform",
+  "transform",
+  "transform-box",
+  "transform-origin",
+  "translate",
+  "rotate",
+  "scale",
+  "transition",
+  "transition-property",
+  "transition-duration",
+  "transition-timing-function",
+  "filter",
+  "backdrop-filter",
+  "object-fit",
+  "object-position",
+  "clip-path",
+  "fill",
+  "fill-opacity",
+  "fill-rule",
+  "stroke",
+  "stroke-width",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "stroke-dasharray",
+  "stroke-dashoffset",
+  "stroke-opacity",
+  "vector-effect",
+  "animation",
+  "animation-name",
+  "animation-duration",
+  "animation-delay",
+  "animation-timing-function",
+  "animation-iteration-count",
+  "animation-direction",
+  "animation-fill-mode",
+  "animation-play-state",
+] as const;
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -99,7 +236,7 @@ function getComputedDeclarations(
   includeVariables: boolean,
 ) {
   const style = view.getComputedStyle(element);
-  const declarations = Array.from(style)
+  const declarations = portableProperties
     .map((property) => [property, style.getPropertyValue(property).trim()] as const)
     .filter(([, value]) => value)
     .map(([property, value]) => `${property}: ${value};`);
@@ -107,9 +244,7 @@ function getComputedDeclarations(
   if (includeVariables) {
     for (const property of pointerBubbleVariables) {
       const value = style.getPropertyValue(property).trim();
-      if (value && !declarations.some((line) => line.startsWith(`${property}:`))) {
-        declarations.unshift(`${property}: ${value};`);
-      }
+      if (value) declarations.unshift(`${property}: ${value};`);
     }
   }
 
@@ -156,7 +291,7 @@ function collectKeyframes(document: Document, animationNames: Set<string>) {
       visitRules(stylesheet.cssRules);
     } catch {
       // Cross-origin stylesheets cannot expose cssRules. Their resolved values
-      // are already captured on each exported element below.
+      // are already captured on each exported element.
     }
   }
 
