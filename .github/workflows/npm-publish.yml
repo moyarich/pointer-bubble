@@ -3,11 +3,6 @@ name: Publish npm package
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: Package version to publish (must match package.json)
-        required: true
-        default: 0.1.1
-        type: string
       tag:
         description: npm distribution tag
         required: true
@@ -41,15 +36,8 @@ jobs:
           cache: npm
       - name: Install dependencies from package.json
         run: npm install --package-lock=false
-      - name: Validate publish version
-        env:
-          PUBLISH_VERSION: ${{ inputs.version }}
-        run: |
-          PACKAGE_VERSION="$(node -p "require('./packages/pointer-bubble/package.json').version")"
-          if [ "$PACKAGE_VERSION" != "$PUBLISH_VERSION" ]; then
-            echo "Requested version $PUBLISH_VERSION does not match package.json version $PACKAGE_VERSION."
-            exit 1
-          fi
+      - name: Show package version
+        run: node -p "'Publishing @moyarich/pointer-bubble@' + require('./packages/pointer-bubble/package.json').version"
       - name: Publish package
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
