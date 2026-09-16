@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 
 const minZoom = 0.5;
-const maxZoom = 2;
+const maxZoom = 5;
 const zoomStep = 0.25;
 
 function setBubbleZoom(root: ParentNode, zoom: number) {
