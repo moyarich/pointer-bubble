@@ -1,4 +1,5 @@
 import pointerBubbleStyles from "@moyarich/pointer-bubble/styles.css?inline";
+
 const ESBUILD_VERSION = "0.27.0";
 const ESBUILD_MODULE_URL = `https://esm.sh/esbuild-wasm@${ESBUILD_VERSION}`;
 const ESBUILD_WASM_URL = `https://cdn.jsdelivr.net/npm/esbuild-wasm@${ESBUILD_VERSION}/esbuild.wasm`;
@@ -94,18 +95,18 @@ export async function initializeSharedEsbuild() {
 }
 
 function getIframePreviewComponentName(sourceCode: string) {
-  const token = "export default function ";
-  const start = sourceCode.indexOf(token);
-  if (start < 0) return "Demo";
-
-  const nameStart = start + token.length;
-  const rest = sourceCode.slice(nameStart);
-  const name = rest.split("(")[0]?.trim();
-  return name || "Demo";
+  const match = sourceCode.match(
+    /export\s+(?:default\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/,
+  );
+  return match?.[1] ?? "Demo";
 }
 
 function removeQuoteSyntax(value: string) {
-  return value.trim().replace(";", "").replaceAll("'", "").replaceAll('"', "");
+  return value
+    .trim()
+    .replace(";", "")
+    .replaceAll("'", "")
+    .replaceAll('"', "");
 }
 
 function normalizeNamedImportBindings(bindings: string) {
@@ -187,19 +188,28 @@ function previewImportLineToAssignment(line: string) {
   );
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function prepareIframePreviewSource(sourceCode: string) {
   const componentName = getIframePreviewComponentName(sourceCode);
+  const escapedComponentName = escapeRegExp(componentName);
 
   return sourceCode
     .split(String.fromCharCode(10))
     .map(previewImportLineToAssignment)
     .join(String.fromCharCode(10))
     .replace(
-      "export default function " + componentName,
+      new RegExp(
+        "export\\s+default\\s+function\\s+" + escapedComponentName,
+      ),
       "function " + componentName,
     )
-    .replace("export default function Demo", "function Demo")
-    .replace("export function Demo", "function Demo");
+    .replace(
+      new RegExp("export\\s+function\\s+" + escapedComponentName),
+      "function " + componentName,
+    );
 }
 
 export function createIframePreviewEntrySource(sourceCode: string) {
@@ -231,9 +241,6 @@ export function createIsolatedPreviewHtml() {
   <body>
     <div id="root"></div>
     <script type="module">
-      let React;
-      let createRoot;
-
       const rootElement = document.getElementById('root');
       let root;
 
@@ -248,28 +255,57 @@ export function createIsolatedPreviewHtml() {
 
         try {
           const hostModules = getPreviewHostModules();
-          React = hostModules.react;
-          createRoot = hostModules['react-dom/client'].createRoot;
+          const React = hostModules.react;
+          const runtimeReactDomClient = hostModules['react-dom/client'];
+          const createRoot = runtimeReactDomClient?.createRoot;
           const runtimePointerBubble = hostModules['@moyarich/pointer-bubble']?.PointerBubble;
           const runtimeMapLibre = hostModules['maplibre-gl'];
-          const runtimeReactDomClient = hostModules['react-dom/client'] ?? { createRoot };
+
+          if (!React) throw new Error('React is not available in the preview runtime.');
+          if (typeof createRoot !== 'function') throw new Error('react-dom/client is not available in the preview runtime.');
+          if (typeof runtimePointerBubble !== 'function') throw new Error('@moyarich/pointer-bubble is not available in the preview runtime.');
 
           delete globalThis.__POINTER_BUBBLE_DEMO__;
-          const getDemo = new Function('React', 'PointerBubble', 'maplibregl', 'createRoot', 'passedModules', event.data.compiledCode + String.fromCharCode(10) + 'return globalThis.__POINTER_BUBBLE_DEMO__;');
-          const Demo = getDemo(React, runtimePointerBubble, runtimeMapLibre, runtimeReactDomClient.createRoot ?? createRoot, hostModules);
+          const getDemo = new Function(
+            'React',
+            'PointerBubble',
+            'maplibregl',
+            'createRoot',
+            'passedModules',
+            event.data.compiledCode + String.fromCharCode(10) + 'return globalThis.__POINTER_BUBBLE_DEMO__;',
+          );
+          const Demo = getDemo(
+            React,
+            runtimePointerBubble,
+            runtimeMapLibre,
+            createRoot,
+            hostModules,
+          );
           if (typeof Demo !== 'function') throw new Error('The preview code must export a Demo component.');
 
-          // Only replace the visible preview after the new source has evaluated
-          // successfully. Temporary syntax/runtime issues while typing therefore
-          // leave the last good preview visible.
-          root?.unmount();
-          rootElement.innerHTML = '';
-          root = createRoot(rootElement);
+          // Keep one React root for the lifetime of the iframe. Re-rendering the
+          // new Demo into the same root makes prop-only editor changes update
+          // immediately instead of tearing down the preview between runs.
+          root ??= createRoot(rootElement);
           root.render(React.createElement(Demo));
-          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_READY', requestId }, '*');
+
+          requestAnimationFrame(() => {
+            window.parent.postMessage(
+              { type: 'POINTER_BUBBLE_PREVIEW_READY', requestId },
+              '*',
+            );
+          });
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
-          window.parent.postMessage({ type: 'POINTER_BUBBLE_PREVIEW_ERROR', requestId, message, category: 'Runtime error' }, '*');
+          window.parent.postMessage(
+            {
+              type: 'POINTER_BUBBLE_PREVIEW_ERROR',
+              requestId,
+              message,
+              category: 'Runtime error',
+            },
+            '*',
+          );
         }
       });
     </script>
