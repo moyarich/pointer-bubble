@@ -13,161 +13,7 @@ export function publishRenderedOutput(output: RenderedOutput | null) {
   );
 }
 
-const semanticSelectors = [
-  ".pointer-bubble",
-  ".pointer-bubble > .pb-pulse",
-  ".pointer-bubble > .pb-body",
-  ".pointer-bubble .pb-tip",
-  ".pointer-bubble .pb-tip-outer",
-  ".pointer-bubble .pb-tip-inner",
-  ".pointer-bubble .pb-content",
-  ".pointer-bubble > .pb-shadow-wrap",
-  ".pointer-bubble .pb-shadow",
-] as const;
-
-type SemanticSelector = (typeof semanticSelectors)[number];
-
-const targetSelectorByCss: Record<SemanticSelector, string | null> = {
-  ".pointer-bubble": null,
-  ".pointer-bubble > .pb-pulse": ":scope > .pb-pulse",
-  ".pointer-bubble > .pb-body": ":scope > .pb-body",
-  ".pointer-bubble .pb-tip": ".pb-tip",
-  ".pointer-bubble .pb-tip-outer": ".pb-tip-outer",
-  ".pointer-bubble .pb-tip-inner": ".pb-tip-inner",
-  ".pointer-bubble .pb-content": ".pb-content",
-  ".pointer-bubble > .pb-shadow-wrap": ":scope > .pb-shadow-wrap",
-  ".pointer-bubble .pb-shadow": ".pb-shadow",
-};
-
-const propertiesBySelector: Record<SemanticSelector, string[]> = {
-  ".pointer-bubble": [
-    "position",
-    "display",
-    "flex-direction",
-    "align-items",
-    "padding-bottom",
-    "min-width",
-    "max-width",
-    "width",
-    "min-height",
-    "max-height",
-    "height",
-  ],
-  ".pointer-bubble > .pb-pulse": [
-    "position",
-    "left",
-    "top",
-    "z-index",
-    "translate",
-    "transform",
-    "border-radius",
-    "background-color",
-    "width",
-    "height",
-    "opacity",
-    "animation",
-  ],
-  ".pointer-bubble > .pb-body": [
-    "position",
-    "display",
-    "place-items",
-    "min-width",
-    "max-width",
-    "width",
-    "min-height",
-    "max-height",
-    "height",
-    "padding",
-    "border-width",
-    "border-style",
-    "border-color",
-    "border-radius",
-    "background-color",
-    "color",
-    "font-size",
-    "font-weight",
-    "line-height",
-    "box-shadow",
-    "translate",
-    "scale",
-    "transform",
-    "transition",
-  ],
-  ".pointer-bubble .pb-tip": ["position", "bottom"],
-  ".pointer-bubble .pb-tip-outer": [
-    "position",
-    "left",
-    "top",
-    "z-index",
-    "translate",
-    "margin-top",
-    "border-left-width",
-    "border-left-style",
-    "border-left-color",
-    "border-right-width",
-    "border-right-style",
-    "border-right-color",
-    "border-top-width",
-    "border-top-style",
-    "border-top-color",
-  ],
-  ".pointer-bubble .pb-tip-inner": [
-    "position",
-    "left",
-    "top",
-    "z-index",
-    "translate",
-    "margin-top",
-    "border-left-width",
-    "border-left-style",
-    "border-left-color",
-    "border-right-width",
-    "border-right-style",
-    "border-right-color",
-    "border-top-width",
-    "border-top-style",
-    "border-top-color",
-  ],
-  ".pointer-bubble .pb-content": [
-    "position",
-    "z-index",
-    "display",
-    "place-items",
-    "min-width",
-    "max-width",
-    "width",
-    "min-height",
-    "max-height",
-    "height",
-    "padding",
-    "border-width",
-    "border-style",
-    "border-color",
-    "border-radius",
-    "background-color",
-    "color",
-    "font-size",
-    "font-weight",
-    "line-height",
-    "text-align",
-    "white-space",
-    "overflow-wrap",
-    "filter",
-    "backdrop-filter",
-  ],
-  ".pointer-bubble > .pb-shadow-wrap": ["position", "width", "height"],
-  ".pointer-bubble .pb-shadow": [
-    "position",
-    "left",
-    "translate",
-    "margin-top",
-    "width",
-    "height",
-    "border-radius",
-    "background-color",
-    "filter",
-  ],
-};
+const exportIdAttribute = "data-pb-export-id";
 
 const pointerBubbleVariables = [
   "--pb-background-color",
@@ -198,6 +44,143 @@ const pointerBubbleVariables = [
   "--pb-tip-inner-offset-y",
 ] as const;
 
+// Keep the export self-contained without dumping the playground's entire
+// computed-style environment (Tailwind theme variables, Monaco variables,
+// browser-only defaults, etc.). These are the visual/layout properties needed
+// to reproduce PointerBubble and consumer content in a blank document.
+const portableProperties = [
+  "position",
+  "inset",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "z-index",
+  "display",
+  "box-sizing",
+  "width",
+  "min-width",
+  "max-width",
+  "height",
+  "min-height",
+  "max-height",
+  "aspect-ratio",
+  "margin",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "padding",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "gap",
+  "row-gap",
+  "column-gap",
+  "flex",
+  "flex-basis",
+  "flex-direction",
+  "flex-grow",
+  "flex-shrink",
+  "flex-wrap",
+  "align-content",
+  "align-items",
+  "align-self",
+  "justify-content",
+  "justify-items",
+  "justify-self",
+  "place-content",
+  "place-items",
+  "place-self",
+  "grid-auto-columns",
+  "grid-auto-flow",
+  "grid-auto-rows",
+  "grid-column",
+  "grid-row",
+  "grid-template-columns",
+  "grid-template-rows",
+  "overflow",
+  "overflow-x",
+  "overflow-y",
+  "overflow-wrap",
+  "white-space",
+  "border",
+  "border-width",
+  "border-style",
+  "border-color",
+  "border-top-width",
+  "border-right-width",
+  "border-bottom-width",
+  "border-left-width",
+  "border-top-style",
+  "border-right-style",
+  "border-bottom-style",
+  "border-left-style",
+  "border-top-color",
+  "border-right-color",
+  "border-bottom-color",
+  "border-left-color",
+  "border-radius",
+  "border-top-left-radius",
+  "border-top-right-radius",
+  "border-bottom-right-radius",
+  "border-bottom-left-radius",
+  "background",
+  "background-color",
+  "background-image",
+  "background-position",
+  "background-repeat",
+  "background-size",
+  "box-shadow",
+  "color",
+  "opacity",
+  "font-family",
+  "font-size",
+  "font-style",
+  "font-weight",
+  "line-height",
+  "letter-spacing",
+  "text-align",
+  "text-decoration",
+  "text-transform",
+  "transform",
+  "transform-box",
+  "transform-origin",
+  "translate",
+  "rotate",
+  "scale",
+  "transition",
+  "transition-property",
+  "transition-duration",
+  "transition-timing-function",
+  "filter",
+  "backdrop-filter",
+  "object-fit",
+  "object-position",
+  "clip-path",
+  "fill",
+  "fill-opacity",
+  "fill-rule",
+  "stroke",
+  "stroke-width",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "stroke-dasharray",
+  "stroke-dashoffset",
+  "stroke-opacity",
+  "vector-effect",
+  "animation",
+  "animation-name",
+  "animation-duration",
+  "animation-delay",
+  "animation-timing-function",
+  "animation-iteration-count",
+  "animation-direction",
+  "animation-fill-mode",
+  "animation-play-state",
+] as const;
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -209,12 +192,12 @@ function escapeHtml(value: string) {
 function formatNode(node: Node, depth = 0): string {
   const indent = "  ".repeat(depth);
 
-  if (node.nodeType === 3) {
+  if (node.nodeType === Node.TEXT_NODE) {
     const text = node.textContent?.trim();
     return text ? `${indent}${escapeHtml(text)}` : "";
   }
 
-  if (node.nodeType !== 1) return "";
+  if (node.nodeType !== Node.ELEMENT_NODE) return "";
   const element = node as Element;
   const tag = element.tagName.toLowerCase();
   const attributes = Array.from(element.attributes)
@@ -236,56 +219,116 @@ function cssBlock(selector: string, declarations: string[]) {
 }
 
 function resolveBubble(root: ParentNode) {
-  if (root.nodeType === 1) {
+  if (root.nodeType === Node.ELEMENT_NODE) {
     const element = root as HTMLElement;
     if (element.matches(".pointer-bubble")) return element;
   }
   return root.querySelector<HTMLElement>(".pointer-bubble");
 }
 
+function getElementTree(root: Element) {
+  return [root, ...Array.from(root.querySelectorAll("*"))];
+}
+
+function getComputedDeclarations(
+  view: Window,
+  element: Element,
+  includeVariables: boolean,
+) {
+  const style = view.getComputedStyle(element);
+  const declarations = portableProperties
+    .map((property) => [property, style.getPropertyValue(property).trim()] as const)
+    .filter(([, value]) => value)
+    .map(([property, value]) => `${property}: ${value};`);
+
+  if (includeVariables) {
+    for (const property of pointerBubbleVariables) {
+      const value = style.getPropertyValue(property).trim();
+      if (value) declarations.unshift(`${property}: ${value};`);
+    }
+  }
+
+  return declarations;
+}
+
+function collectAnimationNames(view: Window, elements: Element[]) {
+  const names = new Set<string>();
+
+  for (const element of elements) {
+    const animationNames = view
+      .getComputedStyle(element)
+      .getPropertyValue("animation-name")
+      .split(",")
+      .map((name) => name.trim())
+      .filter((name) => name && name !== "none");
+
+    animationNames.forEach((name) => names.add(name));
+  }
+
+  return names;
+}
+
+function collectKeyframes(document: Document, animationNames: Set<string>) {
+  if (animationNames.size === 0) return [];
+
+  const blocks: string[] = [];
+
+  function visitRules(rules: CSSRuleList) {
+    for (const rule of Array.from(rules)) {
+      if (rule.type === CSSRule.KEYFRAMES_RULE) {
+        const keyframes = rule as CSSKeyframesRule;
+        if (animationNames.has(keyframes.name)) blocks.push(keyframes.cssText);
+        continue;
+      }
+
+      const nestedRules = (rule as CSSGroupingRule).cssRules;
+      if (nestedRules) visitRules(nestedRules);
+    }
+  }
+
+  for (const stylesheet of Array.from(document.styleSheets)) {
+    try {
+      visitRules(stylesheet.cssRules);
+    } catch {
+      // Cross-origin stylesheets cannot expose cssRules. Their resolved values
+      // are already captured on each exported element.
+    }
+  }
+
+  return [...new Set(blocks)];
+}
+
 export function createRenderedOutput(root: ParentNode): RenderedOutput | null {
   const bubble = resolveBubble(root);
   if (!bubble) return null;
 
-  const view = bubble.ownerDocument.defaultView;
+  const document = bubble.ownerDocument;
+  const view = document.defaultView;
   if (!view) return null;
 
-  const rootStyle = view.getComputedStyle(bubble);
-  const variableDeclarations = pointerBubbleVariables
-    .map(
-      (property) =>
-        [property, rootStyle.getPropertyValue(property).trim()] as const,
-    )
-    .filter(([, value]) => value)
-    .map(([property, value]) => `${property}: ${value};`);
+  const originalElements = getElementTree(bubble);
+  const clonedBubble = bubble.cloneNode(true) as HTMLElement;
+  const clonedElements = getElementTree(clonedBubble);
 
-  const cssBlocks = semanticSelectors
-    .map((selector) => {
-      const targetSelector = targetSelectorByCss[selector];
-      const element = targetSelector
-        ? bubble.querySelector<HTMLElement>(targetSelector)
-        : bubble;
-      if (!element) return "";
+  if (originalElements.length !== clonedElements.length) return null;
 
-      const style = view.getComputedStyle(element);
-      const declarations = propertiesBySelector[selector]
-        .map(
-          (property) =>
-            [property, style.getPropertyValue(property).trim()] as const,
-        )
-        .filter(([, value]) => value)
-        .map(([property, value]) => `${property}: ${value};`);
+  const cssBlocks = originalElements.map((element, index) => {
+    const exportId = String(index);
+    clonedElements[index].setAttribute(exportIdAttribute, exportId);
 
-      if (selector === ".pointer-bubble") {
-        declarations.unshift(...variableDeclarations);
-      }
+    return cssBlock(
+      `[${exportIdAttribute}="${exportId}"]`,
+      getComputedDeclarations(view, element, index === 0),
+    );
+  });
 
-      return cssBlock(selector, declarations);
-    })
-    .filter(Boolean);
+  const keyframes = collectKeyframes(
+    document,
+    collectAnimationNames(view, originalElements),
+  );
 
   return {
-    html: formatNode(bubble),
-    css: cssBlocks.join("\n\n"),
+    html: formatNode(clonedBubble),
+    css: [...cssBlocks, ...keyframes].filter(Boolean).join("\n\n"),
   };
 }
