@@ -6,4 +6,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Generated from ./README.md during npm pack / npm publish. Never commit it.
 packages/pointer-bubble/README.md
