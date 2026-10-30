@@ -1,4 +1,4 @@
-import { PointerBubble } from '@moyarich/pointer-bubble';
+import { PointerBubble } from "@moyarich/pointer-bubble";
 
 export function Demo() {
   return (

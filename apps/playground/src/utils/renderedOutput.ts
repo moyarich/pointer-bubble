@@ -237,7 +237,10 @@ function getComputedDeclarations(
 ) {
   const style = view.getComputedStyle(element);
   const declarations = portableProperties
-    .map((property) => [property, style.getPropertyValue(property).trim()] as const)
+    .map(
+      (property) =>
+        [property, style.getPropertyValue(property).trim()] as const,
+    )
     .filter(([, value]) => value)
     .map(([property, value]) => `${property}: ${value};`);
 

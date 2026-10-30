@@ -1,7 +1,7 @@
-import { PointerBubble } from '@moyarich/pointer-bubble';
-import { Leaf, Sprout, TreePine } from 'lucide-react';
+import { PointerBubble } from "@moyarich/pointer-bubble";
+import { Leaf, Sprout, TreePine } from "lucide-react";
 
-function InlineShieldSvg({ strokeColor = 'currentColor' }) {
+function InlineShieldSvg({ strokeColor = "currentColor" }) {
   return (
     <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden="true">
       <path
@@ -9,7 +9,13 @@ function InlineShieldSvg({ strokeColor = 'currentColor' }) {
         fill="currentColor"
         opacity="0.95"
       />
-      <path d="M12 7v10M8.5 10.5 12 13l3.5-2.5" stroke={strokeColor} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M12 7v10M8.5 10.5 12 13l3.5-2.5"
+        stroke={strokeColor}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -17,54 +23,54 @@ function InlineShieldSvg({ strokeColor = 'currentColor' }) {
 const mapPins = [
   {
     id: 1,
-    name: 'Mint',
-    left: '16%',
-    top: '30%',
-    backgroundColor: '#79bd9a',
-    borderColor: '#18173b',
-    size: 'sm',
+    name: "Mint",
+    left: "16%",
+    top: "30%",
+    backgroundColor: "#79bd9a",
+    borderColor: "#18173b",
+    size: "sm",
     selected: true,
     content: <Leaf className="h-4 w-4" strokeWidth={3} />,
   },
   {
     id: 2,
-    name: 'Oak',
-    left: '31%',
-    top: '18%',
-    backgroundColor: '#facc15',
-    borderColor: '#713f12',
-    textColor: '#422006',
-    size: 'xs',
+    name: "Oak",
+    left: "31%",
+    top: "18%",
+    backgroundColor: "#facc15",
+    borderColor: "#713f12",
+    textColor: "#422006",
+    size: "xs",
     content: <TreePine className="h-3.5 w-3.5" strokeWidth={3} />,
   },
   {
     id: 3,
-    name: 'Berry',
-    left: '47%',
-    top: '52%',
-    backgroundColor: '#fb7185',
-    borderColor: '#881337',
-    size: 'md',
-    content: 'Berry',
+    name: "Berry",
+    left: "47%",
+    top: "52%",
+    backgroundColor: "#fb7185",
+    borderColor: "#881337",
+    size: "md",
+    content: "Berry",
   },
   {
     id: 4,
-    name: 'Lake',
-    left: '64%',
-    top: '34%',
-    backgroundColor: '#38bdf8',
-    borderColor: '#075985',
-    size: 'sm',
+    name: "Lake",
+    left: "64%",
+    top: "34%",
+    backgroundColor: "#38bdf8",
+    borderColor: "#075985",
+    size: "sm",
     content: <InlineShieldSvg />,
   },
   {
     id: 5,
-    name: 'Tiny',
-    left: '88%',
-    top: '54%',
-    backgroundColor: '#65a30d',
-    borderColor: '#365314',
-    size: 'xxs',
+    name: "Tiny",
+    left: "88%",
+    top: "54%",
+    backgroundColor: "#65a30d",
+    borderColor: "#365314",
+    size: "xxs",
     content: <Sprout className="h-3 w-3" strokeWidth={3} />,
   },
 ];

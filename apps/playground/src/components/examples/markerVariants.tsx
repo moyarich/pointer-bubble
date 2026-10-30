@@ -1,6 +1,10 @@
 import { type ReactNode } from "react";
 import { Check, Leaf, Sprout, X } from "lucide-react";
-import { PointerBubble, type PointerBubbleProps, type PointerBubbleSize } from "@moyarich/pointer-bubble";
+import {
+  PointerBubble,
+  type PointerBubbleProps,
+  type PointerBubbleSize,
+} from "@moyarich/pointer-bubble";
 import { PlaygroundDrawerTrigger } from "../drawer/PlaygroundDrawer";
 import { InlineShieldSvg } from "./InlineShieldSvg";
 import { findExampleSource } from "@/utils/findExampleSource";
@@ -130,7 +134,9 @@ const featureVariants: Array<{
       shadowClass: "mt-3 h-2 w-8 bg-blue-950/15",
       children: "5",
     },
-    sourceCode: findExampleSource("markers/simple-circle-outline-number-marker"),
+    sourceCode: findExampleSource(
+      "markers/simple-circle-outline-number-marker",
+    ),
   },
   {
     id: "Red Letter Teardrop Marker",

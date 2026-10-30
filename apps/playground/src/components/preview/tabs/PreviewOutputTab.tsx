@@ -17,7 +17,8 @@ function setBubbleZoom(root: ParentNode, zoom: number) {
 function applyPreviewZoom(host: HTMLElement, zoom: number) {
   setBubbleZoom(host, zoom);
 
-  const iframeDocument = host.querySelector<HTMLIFrameElement>("iframe")?.contentDocument;
+  const iframeDocument =
+    host.querySelector<HTMLIFrameElement>("iframe")?.contentDocument;
   if (iframeDocument) setBubbleZoom(iframeDocument, zoom);
 }
 

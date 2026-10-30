@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Leaf, Sprout, TreePine } from "lucide-react";
-import { PointerBubble, type PointerBubbleSize } from "@moyarich/pointer-bubble";
+import {
+  PointerBubble,
+  type PointerBubbleSize,
+} from "@moyarich/pointer-bubble";
 import { cn } from "@/lib/utils";
 import { createRoot, type Root } from "react-dom/client";
 import * as maplibregl from "../maplibre";
