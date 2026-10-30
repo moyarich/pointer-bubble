@@ -127,32 +127,32 @@ The full playground example is in [`apps/playground/examples/maps/map-libre-pins
 
 ## Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | required | Content displayed inside the bubble |
-| `size` | `"xxs" \| "xs" \| "sm" \| "md" \| "lg"` | `"md"` | Bubble size |
-| `backgroundColor` | `string` | `"#79bd9a"` | Bubble background color |
-| `borderColor` | `string` | `"#18173b"` | Bubble border and outer tip color |
-| `textColor` | `string` | `"#ffffff"` | Content color |
-| `selected` | `boolean` | `false` | Raises the bubble and shows a selection ring |
-| `selectedRingColor` | `string` | `"#ffffff"` | Selection ring color |
-| `showTip` | `boolean` | `true` | Shows the pointer tip |
-| `showShadow` | `boolean` | `true` | Shows the ground shadow |
-| `shadowColor` | `string` | `"rgba(0, 0, 0, 0.25)"` | Ground shadow color |
-| `showPulse` | `boolean` | `false` | Shows a pulse while selected |
-| `pulseColor` | `string` | bubble background | Pulse color |
-| `showContentBackground` | `boolean` | `true` | Shows the inner content background |
-| `contentBackgroundColor` | `string` | `"rgba(255, 255, 255, 0.2)"` | Inner content background color |
-| `showContentBorder` | `boolean` | `true` | Shows the inner content border |
-| `contentBorderColor` | `string` | `"rgba(255, 255, 255, 0.4)"` | Inner content border color |
-| `rootClass` | `string` | — | Class for the outer wrapper |
-| `className` | `string` | — | Class for the bubble body |
-| `contentClass` | `string` | — | Class for the inner content |
-| `pulseClass` | `string` | — | Class for the pulse |
-| `shadowClass` | `string` | — | Class for the ground shadow |
-| `tipClass` | `string` | — | Class for the tip wrapper |
-| `outerTipClass` | `string` | — | Class for the outer tip |
-| `innerTipClass` | `string` | — | Class for the inner tip |
+| Prop                     | Type                                    | Default                      | Description                                  |
+| ------------------------ | --------------------------------------- | ---------------------------- | -------------------------------------------- |
+| `children`               | `ReactNode`                             | required                     | Content displayed inside the bubble          |
+| `size`                   | `"xxs" \| "xs" \| "sm" \| "md" \| "lg"` | `"md"`                       | Bubble size                                  |
+| `backgroundColor`        | `string`                                | `"#79bd9a"`                  | Bubble background color                      |
+| `borderColor`            | `string`                                | `"#18173b"`                  | Bubble border and outer tip color            |
+| `textColor`              | `string`                                | `"#ffffff"`                  | Content color                                |
+| `selected`               | `boolean`                               | `false`                      | Raises the bubble and shows a selection ring |
+| `selectedRingColor`      | `string`                                | `"#ffffff"`                  | Selection ring color                         |
+| `showTip`                | `boolean`                               | `true`                       | Shows the pointer tip                        |
+| `showShadow`             | `boolean`                               | `true`                       | Shows the ground shadow                      |
+| `shadowColor`            | `string`                                | `"rgba(0, 0, 0, 0.25)"`      | Ground shadow color                          |
+| `showPulse`              | `boolean`                               | `false`                      | Shows a pulse while selected                 |
+| `pulseColor`             | `string`                                | bubble background            | Pulse color                                  |
+| `showContentBackground`  | `boolean`                               | `true`                       | Shows the inner content background           |
+| `contentBackgroundColor` | `string`                                | `"rgba(255, 255, 255, 0.2)"` | Inner content background color               |
+| `showContentBorder`      | `boolean`                               | `true`                       | Shows the inner content border               |
+| `contentBorderColor`     | `string`                                | `"rgba(255, 255, 255, 0.4)"` | Inner content border color                   |
+| `rootClass`              | `string`                                | —                            | Class for the outer wrapper                  |
+| `className`              | `string`                                | —                            | Class for the bubble body                    |
+| `contentClass`           | `string`                                | —                            | Class for the inner content                  |
+| `pulseClass`             | `string`                                | —                            | Class for the pulse                          |
+| `shadowClass`            | `string`                                | —                            | Class for the ground shadow                  |
+| `tipClass`               | `string`                                | —                            | Class for the tip wrapper                    |
+| `outerTipClass`          | `string`                                | —                            | Class for the outer tip                      |
+| `innerTipClass`          | `string`                                | —                            | Class for the inner tip                      |
 
 `PointerBubbleProps` extends `React.ComponentPropsWithRef<"div">`, so standard `div` attributes, event handlers, ARIA attributes, `style`, and refs are supported.
 

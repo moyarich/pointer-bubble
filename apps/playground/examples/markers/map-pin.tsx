@@ -1,5 +1,5 @@
-import { PointerBubble } from '@moyarich/pointer-bubble';
-import { Leaf } from 'lucide-react';
+import { PointerBubble } from "@moyarich/pointer-bubble";
+import { Leaf } from "lucide-react";
 
 export function Demo() {
   return (

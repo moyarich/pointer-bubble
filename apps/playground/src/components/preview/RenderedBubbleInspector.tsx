@@ -234,7 +234,10 @@ export function RenderedBubbleInspector() {
     observePreview(findDrawerOutputHost());
 
     return () => {
-      window.removeEventListener(renderedOutputEventName, handlePublishedOutput);
+      window.removeEventListener(
+        renderedOutputEventName,
+        handlePublishedOutput,
+      );
       drawerObserver.disconnect();
       disconnectPreviewObservers();
     };

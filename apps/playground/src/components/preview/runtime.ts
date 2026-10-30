@@ -12,10 +12,7 @@ export type EsbuildTransformResult = {
 };
 
 export type PreviewErrorCategory =
-  | "Compile error"
-  | "Runtime error"
-  | "Iframe error"
-  | "Preview error";
+  "Compile error" | "Runtime error" | "Iframe error" | "Preview error";
 
 export function getPreviewErrorCategory(error: unknown): PreviewErrorCategory {
   const message = error instanceof Error ? error.message : String(error || "");
@@ -102,11 +99,7 @@ function getIframePreviewComponentName(sourceCode: string) {
 }
 
 function removeQuoteSyntax(value: string) {
-  return value
-    .trim()
-    .replace(";", "")
-    .replaceAll("'", "")
-    .replaceAll('"', "");
+  return value.trim().replace(";", "").replaceAll("'", "").replaceAll('"', "");
 }
 
 function normalizeNamedImportBindings(bindings: string) {
@@ -201,9 +194,7 @@ function prepareIframePreviewSource(sourceCode: string) {
     .map(previewImportLineToAssignment)
     .join(String.fromCharCode(10))
     .replace(
-      new RegExp(
-        "export\\s+default\\s+function\\s+" + escapedComponentName,
-      ),
+      new RegExp("export\\s+default\\s+function\\s+" + escapedComponentName),
       "function " + componentName,
     )
     .replace(

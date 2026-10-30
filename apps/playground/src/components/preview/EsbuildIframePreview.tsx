@@ -100,7 +100,8 @@ export function EsbuildIframePreview({
   const hasRunOnceRef = useRef(false);
 
   function installPreviewHostModules() {
-    const previewWindow = iframeRef.current?.contentWindow as PreviewWindow | null;
+    const previewWindow = iframeRef.current
+      ?.contentWindow as PreviewWindow | null;
     if (!previewWindow) return false;
 
     previewWindow.__PREVIEW_HOST_MODULES__ = previewHostModules;
@@ -157,7 +158,8 @@ export function EsbuildIframePreview({
 
   useEffect(() => {
     function handlePreviewMessage(event: MessageEvent) {
-      if (event.source !== iframeRef.current?.contentWindow || !event.data) return;
+      if (event.source !== iframeRef.current?.contentWindow || !event.data)
+        return;
       if (event.data.requestId !== activeRequestIdRef.current) return;
 
       if (event.data.type === "POINTER_BUBBLE_PREVIEW_READY") {
@@ -188,7 +190,10 @@ export function EsbuildIframePreview({
     const observer = new MutationObserver(() => {
       const requestId = activeRequestIdRef.current;
       window.clearTimeout(captureTimer);
-      captureTimer = window.setTimeout(() => captureRenderedOutput(requestId), 0);
+      captureTimer = window.setTimeout(
+        () => captureRenderedOutput(requestId),
+        0,
+      );
     });
 
     observer.observe(iframeDocument.documentElement, {

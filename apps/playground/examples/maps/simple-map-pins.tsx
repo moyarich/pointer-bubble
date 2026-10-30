@@ -1,5 +1,5 @@
-import { PointerBubble } from '@moyarich/pointer-bubble';
-import { Leaf } from 'lucide-react';
+import { PointerBubble } from "@moyarich/pointer-bubble";
+import { Leaf } from "lucide-react";
 
 function DemoMapShell({ children }) {
   return (
@@ -22,13 +22,22 @@ export default function SimpleMapPinsDemo() {
       </div>
 
       <div className="absolute left-[58%] top-[20%] z-20">
-        <PointerBubble backgroundColor="#facc15" borderColor="#713f12" textColor="#422006" size="sm">
+        <PointerBubble
+          backgroundColor="#facc15"
+          borderColor="#713f12"
+          textColor="#422006"
+          size="sm"
+        >
           Oak
         </PointerBubble>
       </div>
 
       <div className="absolute left-[36%] top-[58%] z-20">
-        <PointerBubble backgroundColor="#fb7185" borderColor="#881337" size="lg">
+        <PointerBubble
+          backgroundColor="#fb7185"
+          borderColor="#881337"
+          size="lg"
+        >
           Berry
         </PointerBubble>
       </div>

@@ -4,8 +4,12 @@
     "types": ["node"],
     "paths": {
       "@/*": ["./src/*"],
-      "@moyarich/pointer-bubble": ["../../packages/pointer-bubble/src/index.ts"],
-      "@moyarich/pointer-bubble/styles.css": ["../../packages/pointer-bubble/src/styles.css"]
+      "@moyarich/pointer-bubble": [
+        "../../packages/pointer-bubble/src/index.ts"
+      ],
+      "@moyarich/pointer-bubble/styles.css": [
+        "../../packages/pointer-bubble/src/styles.css"
+      ]
     }
   },
   "include": ["src", "vite.config.ts"]
