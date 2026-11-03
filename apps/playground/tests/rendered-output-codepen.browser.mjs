@@ -1,37 +1,40 @@
-import assert from 'node:assert/strict';
-import { chromium } from 'playwright';
+import assert from "node:assert/strict";
+import { chromium } from "playwright";
 
-const playgroundUrl = process.env.PLAYGROUND_URL || 'http://127.0.0.1:5173';
+const playgroundUrl = process.env.PLAYGROUND_URL || "http://127.0.0.1:5173";
 const playgroundOrigin = new URL(playgroundUrl).origin;
 
 const browser = await chromium.launch();
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
 });
-await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+await context.grantPermissions(["clipboard-read", "clipboard-write"], {
   origin: playgroundOrigin,
 });
 
 const page = await context.newPage();
 
 try {
-  await page.goto(playgroundUrl, { waitUntil: 'networkidle' });
+  await page.goto(playgroundUrl, { waitUntil: "networkidle" });
 
-  const xsCard = page.getByText('XS', { exact: true }).first();
+  const xsCard = page.getByText("XS", { exact: true }).first();
   await xsCard.locator('xpath=ancestor::*[@role="button"][1]').click();
 
-  const drawer = page.getByRole('dialog');
+  const drawer = page.getByRole("dialog");
   await drawer.waitFor();
 
-  const previewTab = drawer.getByRole('button', { name: 'preview', exact: true });
+  const previewTab = drawer.getByRole("button", {
+    name: "preview",
+    exact: true,
+  });
   await previewTab.click();
 
-  const sourceBubble = drawer.locator('.pointer-bubble').first();
+  const sourceBubble = drawer.locator(".pointer-bubble").first();
   await sourceBubble.waitFor();
   const sourceSnapshot = await readVisualSnapshot(sourceBubble);
 
-  const html = await copyOutputTab(drawer, page, 'html');
-  const css = await copyOutputTab(drawer, page, 'css');
+  const html = await copyOutputTab(drawer, page, "html");
+  const css = await copyOutputTab(drawer, page, "css");
 
   assert.match(html, /data-pb-export-id="0"/);
   assert.match(css, /\[data-pb-export-id="0"\]/);
@@ -58,27 +61,31 @@ try {
   </body>
 </html>`);
 
-  const exportedBubble = codepen.locator('.pointer-bubble').first();
+  const exportedBubble = codepen.locator(".pointer-bubble").first();
   await exportedBubble.waitFor();
   const exportedSnapshot = await readVisualSnapshot(exportedBubble);
 
-  assert.notEqual(exportedSnapshot.visibility, 'hidden');
+  assert.notEqual(exportedSnapshot.visibility, "hidden");
   assertVisualSnapshotEqual(exportedSnapshot, sourceSnapshot);
 
   // The XS example icon uses Tailwind classes (h-3.5 w-3.5). The exported
   // snapshot must preserve those dimensions in a clean page with no Tailwind.
   assert.ok(sourceSnapshot.svgWidth > 0 && sourceSnapshot.svgHeight > 0);
-  assertClose(exportedSnapshot.svgWidth, sourceSnapshot.svgWidth, 'SVG width');
-  assertClose(exportedSnapshot.svgHeight, sourceSnapshot.svgHeight, 'SVG height');
+  assertClose(exportedSnapshot.svgWidth, sourceSnapshot.svgWidth, "SVG width");
+  assertClose(
+    exportedSnapshot.svgHeight,
+    sourceSnapshot.svgHeight,
+    "SVG height",
+  );
 } finally {
   await context.close();
   await browser.close();
 }
 
 async function copyOutputTab(drawer, page, tabName) {
-  await drawer.getByRole('button', { name: tabName, exact: true }).click();
+  await drawer.getByRole("button", { name: tabName, exact: true }).click();
 
-  const panels = drawer.locator('.playground-code-panel');
+  const panels = drawer.locator(".playground-code-panel");
   await assertEventually(async () => (await panels.count()) >= 2);
 
   const outputPanel = panels.last();
@@ -89,13 +96,13 @@ async function copyOutputTab(drawer, page, tabName) {
 
 async function readVisualSnapshot(bubble) {
   return bubble.evaluate((element) => {
-    const body = element.querySelector('.pb-body');
-    const tipOuter = element.querySelector('.pb-tip-outer');
-    const content = element.querySelector('.pb-content');
-    const svg = element.querySelector('svg');
+    const body = element.querySelector(".pb-body");
+    const tipOuter = element.querySelector(".pb-tip-outer");
+    const content = element.querySelector(".pb-content");
+    const svg = element.querySelector("svg");
 
     if (!body || !content || !svg) {
-      throw new Error('Expected PointerBubble body, content, and SVG icon.');
+      throw new Error("Expected PointerBubble body, content, and SVG icon.");
     }
 
     const bubbleRect = element.getBoundingClientRect();
@@ -125,36 +132,36 @@ async function readVisualSnapshot(bubble) {
       svgWidth: svgRect.width,
       svgHeight: svgRect.height,
       svgDisplay: svgStyle.display,
-      tipBorderTopColor: tipStyle?.borderTopColor ?? '',
-      tipBorderTopWidth: tipStyle?.borderTopWidth ?? '',
+      tipBorderTopColor: tipStyle?.borderTopColor ?? "",
+      tipBorderTopWidth: tipStyle?.borderTopWidth ?? "",
     };
   });
 }
 
 function assertVisualSnapshotEqual(actual, expected) {
   for (const key of [
-    'bodyBackground',
-    'bodyBorderColor',
-    'bodyBorderWidth',
-    'bodyBorderRadius',
-    'bodyBoxSizing',
-    'contentDisplay',
-    'svgDisplay',
-    'tipBorderTopColor',
-    'tipBorderTopWidth',
+    "bodyBackground",
+    "bodyBorderColor",
+    "bodyBorderWidth",
+    "bodyBorderRadius",
+    "bodyBoxSizing",
+    "contentDisplay",
+    "svgDisplay",
+    "tipBorderTopColor",
+    "tipBorderTopWidth",
   ]) {
     assert.equal(actual[key], expected[key], key);
   }
 
   for (const key of [
-    'bubbleWidth',
-    'bubbleHeight',
-    'bodyWidth',
-    'bodyHeight',
-    'contentWidth',
-    'contentHeight',
-    'svgWidth',
-    'svgHeight',
+    "bubbleWidth",
+    "bubbleHeight",
+    "bodyWidth",
+    "bodyHeight",
+    "contentWidth",
+    "contentHeight",
+    "svgWidth",
+    "svgHeight",
   ]) {
     assertClose(actual[key], expected[key], key);
   }

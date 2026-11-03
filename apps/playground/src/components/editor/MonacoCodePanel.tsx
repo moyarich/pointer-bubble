@@ -88,7 +88,9 @@ export function MonacoCodePanel({
                 title="Undo"
               >
                 <Undo2 className="h-3.5 w-3.5" />
-                <span className="playground-code-panel__action-label">Undo</span>
+                <span className="playground-code-panel__action-label">
+                  Undo
+                </span>
               </button>
               <button
                 type="button"
@@ -98,7 +100,9 @@ export function MonacoCodePanel({
                 title="Redo"
               >
                 <Redo2 className="h-3.5 w-3.5" />
-                <span className="playground-code-panel__action-label">Redo</span>
+                <span className="playground-code-panel__action-label">
+                  Redo
+                </span>
               </button>
             </>
           )}

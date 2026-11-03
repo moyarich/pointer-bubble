@@ -7,13 +7,19 @@ import {
 } from "./markerExamples";
 
 const SimpleMapPinsDemo = lazy(() =>
-  import("./mapExamples").then((module) => ({ default: module.SimpleMapPinsDemo })),
+  import("./mapExamples").then((module) => ({
+    default: module.SimpleMapPinsDemo,
+  })),
 );
 const MultiPinMapDemo = lazy(() =>
-  import("./mapExamples").then((module) => ({ default: module.MultiPinMapDemo })),
+  import("./mapExamples").then((module) => ({
+    default: module.MultiPinMapDemo,
+  })),
 );
 const MapLibrePinsDemo = lazy(() =>
-  import("./mapExamples").then((module) => ({ default: module.MapLibrePinsDemo })),
+  import("./mapExamples").then((module) => ({
+    default: module.MapLibrePinsDemo,
+  })),
 );
 
 export function PlaygroundExamples() {

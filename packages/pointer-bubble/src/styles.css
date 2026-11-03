@@ -177,7 +177,8 @@
     z-index: 0;
     border-left: var(--pb-tip-outer-border-left-width) solid transparent;
     border-right: var(--pb-tip-outer-border-right-width) solid transparent;
-    border-top: var(--pb-tip-outer-border-top-width) solid var(--pb-border-color);
+    border-top: var(--pb-tip-outer-border-top-width) solid
+      var(--pb-border-color);
   }
 
   :where(.pointer-bubble .pb-tip-inner) {
@@ -186,7 +187,8 @@
     margin-top: calc(-1 * var(--pb-tip-inner-offset-y));
     border-left: var(--pb-tip-inner-border-left-width) solid transparent;
     border-right: var(--pb-tip-inner-border-right-width) solid transparent;
-    border-top: var(--pb-tip-inner-border-top-width) solid var(--pb-background-color);
+    border-top: var(--pb-tip-inner-border-top-width) solid
+      var(--pb-background-color);
   }
 
   :where(.pointer-bubble .pb-content) {

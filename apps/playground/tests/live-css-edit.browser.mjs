@@ -1,10 +1,10 @@
-import assert from 'node:assert/strict';
-import { chromium } from 'playwright';
+import assert from "node:assert/strict";
+import { chromium } from "playwright";
 
-const playgroundUrl = process.env.PLAYGROUND_URL || 'http://127.0.0.1:5173';
+const playgroundUrl = process.env.PLAYGROUND_URL || "http://127.0.0.1:5173";
 
-const initialBorderColor = '#365314';
-const editedBorderColor = '#ff0a54ff';
+const initialBorderColor = "#365314";
+const editedBorderColor = "#ff0a54ff";
 const originalSource = `import { PointerBubble } from '@moyarich/pointer-bubble';
 import { Sprout } from 'lucide-react';
 
@@ -21,49 +21,62 @@ export function Demo() {
 }
 `;
 
-const editedSource = originalSource.replace(initialBorderColor, editedBorderColor);
+const editedSource = originalSource.replace(
+  initialBorderColor,
+  editedBorderColor,
+);
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 
 try {
-  await page.goto(playgroundUrl, { waitUntil: 'networkidle' });
+  await page.goto(playgroundUrl, { waitUntil: "networkidle" });
 
-  const sourceButton = page.getByRole('button', { name: /Open XXS source code/i });
+  const sourceButton = page.getByRole("button", {
+    name: /Open XXS source code/i,
+  });
   await sourceButton.click();
 
-  const drawer = page.getByRole('dialog');
+  const drawer = page.getByRole("dialog");
   await drawer.waitFor();
 
-  const sourcePanel = drawer.locator('.playground-code-panel').first();
-  const sourceInput = sourcePanel.locator('textarea.inputarea');
+  const sourcePanel = drawer.locator(".playground-code-panel").first();
+  const sourceInput = sourcePanel.locator("textarea.inputarea");
 
   await sourceInput.click({ force: true });
-  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+A' : 'Control+A');
+  await page.keyboard.press(
+    process.platform === "darwin" ? "Meta+A" : "Control+A",
+  );
   await page.keyboard.insertText(editedSource);
 
-  const cssTab = drawer.getByRole('button', { name: 'css', exact: true });
+  const cssTab = drawer.getByRole("button", { name: "css", exact: true });
   await cssTab.click();
 
-  await assertEventually(async () => (await cssTab.getAttribute('aria-pressed')) === 'true');
+  await assertEventually(
+    async () => (await cssTab.getAttribute("aria-pressed")) === "true",
+  );
 
   await assertEventually(async () => {
     const text = await drawer.innerText();
-    return !text.includes('No rendered PointerBubble output is available.');
+    return !text.includes("No rendered PointerBubble output is available.");
   });
 
   await assertEventually(async () => {
-    const panels = drawer.locator('.playground-code-panel');
+    const panels = drawer.locator(".playground-code-panel");
     if ((await panels.count()) < 2) return false;
     const cssPanel = panels.last();
-    const text = await cssPanel.locator('.view-lines').innerText();
+    const text = await cssPanel.locator(".view-lines").innerText();
     return (
       text.includes(`--pb-border-color: ${editedBorderColor};`) &&
-      text.includes('--pb-bubble-size: 1.75rem;')
+      text.includes("--pb-bubble-size: 1.75rem;")
     );
   }, 8000);
 
-  const finalCss = await drawer.locator('.playground-code-panel').last().locator('.view-lines').innerText();
+  const finalCss = await drawer
+    .locator(".playground-code-panel")
+    .last()
+    .locator(".view-lines")
+    .innerText();
   assert.match(finalCss, /--pb-border-color:\s*#ff0a54ff;/);
   assert.match(finalCss, /--pb-bubble-size:\s*1\.75rem;/);
 } finally {

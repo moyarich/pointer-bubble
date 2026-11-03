@@ -103,20 +103,20 @@ apps/playground/dist/
 
 ## Repository commands
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the playground |
-| `npm run dev:playground` | Start the playground explicitly |
-| `npm run typecheck` | Typecheck all workspaces that expose a typecheck script |
-| `npm test` | Build and test the library |
-| `npm run build:lib` | Build only the library |
-| `npm run build:playground` | Build only the playground |
-| `npm run build` | Build the library and playground |
-| `npm run preview` | Preview the playground production build |
-| `npm run pack:lib` | Preview the npm package archive |
-| `npm run release:check` | Validate a release without publishing |
-| `npm run publish:lib` | Validate and publish the library |
-| `npm run tasks` | Open the interactive task picker |
+| Command                    | Purpose                                                 |
+| -------------------------- | ------------------------------------------------------- |
+| `npm run dev`              | Start the playground                                    |
+| `npm run dev:playground`   | Start the playground explicitly                         |
+| `npm run typecheck`        | Typecheck all workspaces that expose a typecheck script |
+| `npm test`                 | Build and test the library                              |
+| `npm run build:lib`        | Build only the library                                  |
+| `npm run build:playground` | Build only the playground                               |
+| `npm run build`            | Build the library and playground                        |
+| `npm run preview`          | Preview the playground production build                 |
+| `npm run pack:lib`         | Preview the npm package archive                         |
+| `npm run release:check`    | Validate a release without publishing                   |
+| `npm run publish:lib`      | Validate and publish the library                        |
+| `npm run tasks`            | Open the interactive task picker                        |
 
 ## Package tests
 
@@ -293,7 +293,6 @@ The picker uses `fzf` when available and falls back to a numbered terminal menu.
 npm run tasks -- --list
 ```
 
-
 ## Generate README Screenshots
 
 Start the playground:
@@ -317,4 +316,3 @@ docs/screenshots/maplibre-example.png
 ```
 
 The demo source lives at [`scripts/demos/readme.mjs`](scripts/demos/readme.mjs).
-

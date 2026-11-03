@@ -1,5 +1,5 @@
-import { PointerBubble } from '@moyarich/pointer-bubble';
-import { Check } from 'lucide-react';
+import { PointerBubble } from "@moyarich/pointer-bubble";
+import { Check } from "lucide-react";
 
 export function Demo() {
   return (
@@ -14,7 +14,10 @@ export function Demo() {
       contentClass="h-10 w-10 min-h-0 min-w-0 rotate-[45deg] rounded-full border-[2px] border-[#7faa43] bg-gradient-to-br from-[#c8ed88] via-[#8bc34a] to-[#6da33a] p-0 text-white shadow-[inset_0_2px_4px_rgba(255,255,255,0.45),inset_0_-3px_5px_rgba(0,0,0,0.18)]"
       shadowClass="mt-6 h-2.5 w-10 bg-slate-950/30"
     >
-      <Check className="h-7 w-7 drop-shadow-[0_1px_1px_rgba(0,0,0,0.45)]" strokeWidth={4.5} />
+      <Check
+        className="h-7 w-7 drop-shadow-[0_1px_1px_rgba(0,0,0,0.45)]"
+        strokeWidth={4.5}
+      />
     </PointerBubble>
   );
 }
