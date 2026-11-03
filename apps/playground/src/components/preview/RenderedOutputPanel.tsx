@@ -3,10 +3,14 @@ import { useState } from "react";
 import { MonacoCodePanel } from "../editor/MonacoCodePanel";
 import type { RenderedOutput } from "@/utils/renderedOutput";
 
-export function RenderedOutputPanel({ output }: { output: RenderedOutput | null }) {
+export function RenderedOutputPanel({
+  output,
+}: {
+  output: RenderedOutput | null;
+}) {
   const [tab, setTab] = useState<"html" | "css">("html");
   const [copied, setCopied] = useState(false);
-  const code = tab === "html" ? output?.html ?? "" : output?.css ?? "";
+  const code = tab === "html" ? (output?.html ?? "") : (output?.css ?? "");
 
   async function copyCode() {
     if (!code) return;
@@ -49,13 +53,16 @@ export function RenderedOutputPanel({ output }: { output: RenderedOutput | null 
             code={code}
             readOnly
             language={tab}
-            filename={tab === "html" ? "pointer-bubble.html" : "pointer-bubble.css"}
+            filename={
+              tab === "html" ? "pointer-bubble.html" : "pointer-bubble.css"
+            }
             onCopy={copyCode}
             copied={copied}
           />
         ) : (
           <div className="flex h-full min-h-[150px] items-center justify-center rounded-xl bg-slate-950 px-6 text-center text-xs text-slate-400">
-            Render the PointerBubble preview to inspect its generated HTML and CSS.
+            Render the PointerBubble preview to inspect its generated HTML and
+            CSS.
           </div>
         )}
       </div>

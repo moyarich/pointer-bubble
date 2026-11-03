@@ -12,13 +12,19 @@ export default defineConfig({
       {
         find: /^@moyarich\/pointer-bubble\/styles\.css(?=\?|$)/,
         replacement: fileURLToPath(
-          new URL("../../packages/pointer-bubble/src/styles.css", import.meta.url),
+          new URL(
+            "../../packages/pointer-bubble/src/styles.css",
+            import.meta.url,
+          ),
         ),
       },
       {
         find: "@moyarich/pointer-bubble",
         replacement: fileURLToPath(
-          new URL("../../packages/pointer-bubble/src/index.ts", import.meta.url),
+          new URL(
+            "../../packages/pointer-bubble/src/index.ts",
+            import.meta.url,
+          ),
         ),
       },
       {

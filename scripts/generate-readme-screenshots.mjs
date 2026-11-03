@@ -1,9 +1,11 @@
-import { mkdirSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { chromium } from 'playwright';
+import { mkdirSync } from "node:fs";
+import { resolve } from "node:path";
+import { chromium } from "playwright";
 
-const playgroundUrl = process.env.PLAYGROUND_URL || 'http://127.0.0.1:5173';
-const outputDir = resolve(process.env.SCREENSHOT_OUTPUT_DIR || 'docs/screenshots');
+const playgroundUrl = process.env.PLAYGROUND_URL || "http://127.0.0.1:5173";
+const outputDir = resolve(
+  process.env.SCREENSHOT_OUTPUT_DIR || "docs/screenshots",
+);
 
 mkdirSync(outputDir, { recursive: true });
 
@@ -14,22 +16,24 @@ const page = await browser.newPage({
 });
 
 try {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto(playgroundUrl, { waitUntil: 'networkidle' });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(playgroundUrl, { waitUntil: "networkidle" });
 
   await page.screenshot({
-    path: resolve(outputDir, 'playground-overview.png'),
+    path: resolve(outputDir, "playground-overview.png"),
     clip: { x: 0, y: 0, width: 1440, height: 1000 },
   });
 
   const mapSection = page
-    .locator('section')
-    .filter({ has: page.getByRole('heading', { name: 'MapLibre Demo' }) })
+    .locator("section")
+    .filter({ has: page.getByRole("heading", { name: "MapLibre Demo" }) })
     .first();
 
   await mapSection.scrollIntoViewIfNeeded();
   await page.waitForTimeout(2500);
-  await mapSection.screenshot({ path: resolve(outputDir, 'maplibre-example.png') });
+  await mapSection.screenshot({
+    path: resolve(outputDir, "maplibre-example.png"),
+  });
 } finally {
   await browser.close();
 }

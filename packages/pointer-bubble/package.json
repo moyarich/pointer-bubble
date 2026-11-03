@@ -21,8 +21,14 @@
     },
     "./styles.css": "./dist/styles.css"
   },
-  "files": ["dist"],
-  "sideEffects": ["**/*.css", "./dist/index.js", "./dist/index.cjs"],
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "./dist/index.js",
+    "./dist/index.cjs"
+  ],
   "peerDependencies": {
     "react": ">=18.2.0"
   },

@@ -1,4 +1,4 @@
-import { PointerBubble } from '@moyarich/pointer-bubble';
+import { PointerBubble } from "@moyarich/pointer-bubble";
 
 export function Demo() {
   return (
@@ -12,7 +12,8 @@ export function Demo() {
       className="min-w-0 max-w-[18rem] rounded-2xl px-4 py-3 text-sm font-semibold"
       contentClass="min-h-0 min-w-0 rounded-xl px-3 py-2 text-left leading-relaxed"
     >
-      Speech bubbles can still use the content fill and border when you want an inset message style.
+      Speech bubbles can still use the content fill and border when you want an
+      inset message style.
     </PointerBubble>
   );
 }
